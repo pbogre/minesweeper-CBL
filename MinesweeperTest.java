@@ -89,7 +89,6 @@ public class MinesweeperTest {
                 grid.add(cells[row][col]);
             }
         }
-        //createMines();
         frame.add(grid, BorderLayout.CENTER);
     }
 
