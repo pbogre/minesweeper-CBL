@@ -4,19 +4,10 @@ import java.awt.event.ActionListener;
 import java.util.*;
 import java.awt.event.*;
 
-public class MinesweeperTest {
-    
-    // The value assigned to cells marked as mines. 
-    // 10 works because no cell will have more than 8 neighbouring mines.
-    private static final int MINE = 10;
+public class Minesweeper {
 
     // The size in pixels for the frame.
     private static final int SIZE = 500;
-
-    private int gridSize;
-
-    private Cell[][] cells;
-
     private JFrame  frame;
 
     private final ActionListener actionListener = actionEvent -> {
@@ -26,7 +17,7 @@ public class MinesweeperTest {
     private class Cell extends JButton {
         private final int row;
         private final int col;
-        private       int value;
+        private int value;
 
         Cell(final int row, final int col,
              final ActionListener actionListener) {
@@ -36,7 +27,8 @@ public class MinesweeperTest {
             setText("");
         }
 
-        int getValue() {
+        //TODO: For later implementations
+        /*int getValue() {
             return value;
         }
 
@@ -46,7 +38,7 @@ public class MinesweeperTest {
 
         boolean isAMine() {
             return value == MINE;
-        }
+        }*/
 
         @Override
         public boolean equals(Object obj) {
@@ -63,38 +55,45 @@ public class MinesweeperTest {
             return Objects.hash(row, col);
         }
     }
-    private MinesweeperTest(final int gridSize) {
-        this.gridSize = gridSize;
-        cells = new Cell[gridSize][gridSize];
+    private class Grid {
+        private int gridSize;
+        private Cell[][] cells;
 
-        frame = new JFrame("Minesweeper");
-        frame.setSize(SIZE, SIZE);
-        frame.setLayout(new BorderLayout());
+        public Grid(int gridSize){
+        
+            this.gridSize = gridSize;
+            this.cells = new Cell[gridSize][gridSize];
 
-        //initializeButtonPanel();
-        initializeGrid();
+            frame = new JFrame("Minesweeper");
+            frame.setSize(SIZE, SIZE);
+            frame.setLayout(new BorderLayout());
 
-        frame.setLocationRelativeTo(null);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-    }
+            initializeGrid();
 
-    private void initializeGrid() {
-        Container grid = new Container();
-        grid.setLayout(new GridLayout(gridSize, gridSize));
-
-        for (int row = 0; row < gridSize; row++) {
-            for (int col = 0; col < gridSize; col++) {
-                cells[row][col] = new Cell(row, col, actionListener);
-                grid.add(cells[row][col]);
-            }
+            frame.setLocationRelativeTo(null);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setVisible(true);
         }
-        frame.add(grid, BorderLayout.CENTER);
-    }
 
+        private void initializeGrid() {
+
+            Container grid = new Container();
+            grid.setLayout(new GridLayout(gridSize, gridSize));
+
+            for (int row = 0; row < gridSize; row++) {
+                for (int col = 0; col < gridSize; col++) {
+                    cells[row][col] = new Cell(row, col, actionListener);
+                    grid.add(cells[row][col]);
+                    }
+                }
+            frame.add(grid, BorderLayout.CENTER);
+        }
+    }
     public static void main(String[] args) {
-        //Amount of buttons per row/col
-        final int gridSize = 10;
-        new MinesweeperTest(gridSize);
-    }   
+
+        final int gridSize = 15; 
+        Minesweeper minesweeper = new Minesweeper();
+        Minesweeper.Grid grid = minesweeper.new Grid(gridSize);
+        grid.initializeGrid();
+    }
 }
