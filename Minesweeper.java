@@ -7,7 +7,7 @@ import java.awt.event.*;
 public class Minesweeper {
 
     // The size in pixels for the frame.
-    private static final int SIZE = 500;
+    private static final int WINDOW_SIZE = 500;
     private JFrame  frame;
 
     private final ActionListener actionListener = actionEvent -> {
