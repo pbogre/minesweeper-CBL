@@ -94,6 +94,5 @@ public class Minesweeper {
         final int gridSize = 15; 
         Minesweeper minesweeper = new Minesweeper();
         Minesweeper.Grid grid = minesweeper.new Grid(gridSize);
-        grid.initializeGrid();
     }
 }
