@@ -65,7 +65,7 @@ public class Minesweeper {
             this.cells = new Cell[gridSize][gridSize];
 
             frame = new JFrame("Minesweeper");
-            frame.setSize(SIZE, SIZE);
+            frame.setSize(WINDOW_SIZE, WINDOW_SIZE);
             frame.setLayout(new BorderLayout());
 
             Container container = new Container();
@@ -78,7 +78,7 @@ public class Minesweeper {
                 }
             }
             
-            frame.add(grid, BorderLayout.CENTER);
+            frame.add(container, BorderLayout.CENTER);
             frame.setLocationRelativeTo(null);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setVisible(true);
