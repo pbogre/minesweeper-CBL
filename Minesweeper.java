@@ -68,25 +68,20 @@ public class Minesweeper {
             frame.setSize(SIZE, SIZE);
             frame.setLayout(new BorderLayout());
 
-            initializeGrid();
-
-            frame.setLocationRelativeTo(null);
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setVisible(true);
-        }
-
-        private void initializeGrid() {
-
-            Container grid = new Container();
-            grid.setLayout(new GridLayout(gridSize, gridSize));
+            Container container = new Container();
+            container.setLayout(new GridLayout(gridSize, gridSize));
 
             for (int row = 0; row < gridSize; row++) {
                 for (int col = 0; col < gridSize; col++) {
                     cells[row][col] = new Cell(row, col, actionListener);
-                    grid.add(cells[row][col]);
-                    }
+                    container.add(cells[row][col]);
                 }
+            }
+            
             frame.add(grid, BorderLayout.CENTER);
+            frame.setLocationRelativeTo(null);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setVisible(true);
         }
     }
     public static void main(String[] args) {
