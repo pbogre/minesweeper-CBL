@@ -1,74 +1,95 @@
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.util.*;
+import java.awt.event.*;
 
-class Cell {
-    // game related stuff
-    boolean bomb;
-    boolean revealed;
-    int x;
-    int y;
+public class Minesweeper {
 
-    // swing related stuff
-    JButton button;
+    // The size in pixels for the frame.
+    private static final int WINDOW_SIZE = 500;
+    private JFrame  frame;
 
-    void render(JFrame frame){
-        frame.add(this.button);
+    private final ActionListener actionListener = actionEvent -> {
+        Object source = actionEvent.getSource();
+    };
+
+    private class Cell extends JButton {
+        private final int row;
+        private final int col;
+        private int value;
+
+        Cell(final int row, final int col,
+             final ActionListener actionListener) {
+            this.row = row;
+            this.col = col;
+            addActionListener(actionListener);
+            setText("");
+        }
+
+        //TODO: For later implementations
+        /*int getValue() {
+            return value;
+        }
+
+        void setValue(int value) {
+            this.value = value;
+        }
+
+        boolean isAMine() {
+            return value == MINE;
+        }*/
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass())
+                return false;
+            Cell cell = (Cell) obj;
+            return row == cell.row &&
+                   col == cell.col;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(row, col);
+        }
     }
+  
+    private class Grid {
+        private int gridSize;
+        private Cell[][] cells;
 
-    void makeBomb() {
-        this.bomb = true;
-    }
+        public Grid(int gridSize){
+        
+            this.gridSize = gridSize;
+            this.cells = new Cell[gridSize][gridSize];
 
-    Cell(int x, int y){
-        this.x = x;
-        this.y = y;
-        this.bomb = false;
-        this.revealed = false;
-        this.button = new JButton();
-    }
-}
+            frame = new JFrame("Minesweeper");
+            frame.setSize(WINDOW_SIZE, WINDOW_SIZE);
+            frame.setLayout(new BorderLayout());
 
-class Grid {
-    int size;
-    Cell[][] grid;
+            Container container = new Container();
+            container.setLayout(new GridLayout(gridSize, gridSize));
 
-    int cellSize;
-
-    void render(JFrame frame){
-        for(int y = 0; y < this.size; y++) {
-            for(int x = 0; x < this.size; x++) {
-                this.grid[y][x].render(frame);
+            for (int row = 0; row < gridSize; row++) {
+                for (int col = 0; col < gridSize; col++) {
+                    cells[row][col] = new Cell(row, col, actionListener);
+                    container.add(cells[row][col]);
+                }
             }
+            
+            frame.add(container, BorderLayout.CENTER);
+            frame.setLocationRelativeTo(null);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setVisible(true);
         }
     }
-
-    Grid(int size, int cellSize) {
-        this.size = size;
-        this.cellSize = cellSize;
-        this.grid = new Cell[size][size];
-
-        for(int y = 0; y < this.size; y++) {
-           for(int x = 0; x < this.size; x++) {
-               this.grid[y][x] = new Cell(x, y);
-               this.grid[y][x].button.setBounds(this.cellSize * x, this.cellSize * y, this.cellSize, this.cellSize);
-           }
-        }
-    }
-}
-
-class Minesweeper {
-    static int WIDTH = 500;
-    static int HEIGHT = 500;
-    static int SIZE = 20;
-
+  
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Minesweeper");
 
-        int cellSize = HEIGHT / SIZE;
-        Grid grid = new Grid(SIZE, cellSize);
-        grid.render(frame);
-
-        frame.setSize(500, 500);
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        final int gridSize = 15; 
+        Minesweeper minesweeper = new Minesweeper();
+        Minesweeper.Grid grid = minesweeper.new Grid(gridSize);
     }
 }
