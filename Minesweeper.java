@@ -55,6 +55,7 @@ public class Minesweeper {
             return Objects.hash(row, col);
         }
     }
+  
     private class Grid {
         private int gridSize;
         private Cell[][] cells;
@@ -84,6 +85,7 @@ public class Minesweeper {
             frame.setVisible(true);
         }
     }
+  
     public static void main(String[] args) {
 
         final int gridSize = 15; 
