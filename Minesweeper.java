@@ -32,10 +32,16 @@ public class Minesweeper {
         }
 
         void setNeighboringBombs(int neighboringBombs) {
+            
             this.neighboringBombs = neighboringBombs;
             setText(String.valueOf(this.neighboringBombs));
         }
+        
+        int getNeighboringBombs(Cell cell){
 
+            return Game.computeNeighboringBombs(cell);
+
+        }
         void reveal() {
             this.isRevealed = true;
             /*setIcon(new ImageIcon(new ImageIcon(
@@ -83,10 +89,10 @@ public class Minesweeper {
     }
   
     private class Game extends JFrame{
-        private int gridSize;
+        private static int gridSize;
         private int cellSize;
         private int bombAmount;
-        private Cell[][] cells;
+        private static Cell[][] cells;
 
         private void stop() {
             setVisible(false);
@@ -109,7 +115,7 @@ public class Minesweeper {
                             continue;
                         }
                         // skip out of bounds cases
-                        if(y < 0 || x < 0 || y >= this.gridSize || x >= this.gridSize) {
+                        if(y < 0 || x < 0 || y >= Game.gridSize || x >= Game.gridSize) {
                             continue;
                         }
 
@@ -127,19 +133,19 @@ public class Minesweeper {
             int remainingBombs = this.bombAmount;
 
             while (remainingBombs > 0) {
-                int randomColumn = random.nextInt(this.gridSize);
-                int randomRow = random.nextInt(this.gridSize);
+                int randomColumn = random.nextInt(Game.gridSize);
+                int randomRow = random.nextInt(Game.gridSize);
                 
-                if (this.cells[randomRow][randomColumn].isBomb) {
+                if (Game.cells[randomRow][randomColumn].isBomb) {
                     continue;
                 }
 
-                this.cells[randomRow][randomColumn].makeBomb();
+                Game.cells[randomRow][randomColumn].makeBomb();
                 remainingBombs--;
             }
         }
 
-        private int computeNeighboringBombs(Cell cell) {
+        private static int computeNeighboringBombs(Cell cell) {
 
             int neighboringBombs = 0;
 
@@ -150,11 +156,11 @@ public class Minesweeper {
                         continue;
                     }
                     // skip out of bounds cases
-                    if(y < 0 || x < 0 || y >= this.gridSize || x >= this.gridSize) {
+                    if(y < 0 || x < 0 || y >= Game.gridSize || x >= Game.gridSize) {
                         continue;
                     }
 
-                    if (this.cells[y][x].isBomb) {
+                    if (Game.cells[y][x].isBomb) {
                         neighboringBombs++;
                     }
                 }
@@ -165,15 +171,15 @@ public class Minesweeper {
 
         public Game(int gridSize, int bombAmount){
             this.cellSize = 35;
-            this.gridSize = gridSize;
+            Game.gridSize = gridSize;
             this.bombAmount = bombAmount;
-            this.cells = new Cell[this.gridSize][this.gridSize];
+            Game.cells = new Cell[Game.gridSize][Game.gridSize];
 
-            setSize(this.gridSize * this.cellSize, this.gridSize * this.cellSize);
-            setLayout(new GridLayout(this.gridSize, this.gridSize));
+            setSize(Game.gridSize * this.cellSize, Game.gridSize * this.cellSize);
+            setLayout(new GridLayout(Game.gridSize, Game.gridSize));
 
-            for (int y = 0; y < this.gridSize; y++) {
-                for (int x = 0; x < this.gridSize; x++) {
+            for (int y = 0; y < Game.gridSize; y++) {
+                for (int x = 0; x < Game.gridSize; x++) {
                     cells[y][x] = new Cell(y, x);
                     cells[y][x].setFocusPainted(false);
                     add(cells[y][x]);
@@ -184,18 +190,26 @@ public class Minesweeper {
 
             // must be done after bomb population 
             // as bombs have a separate action listener
-            for (int y = 0; y < this.gridSize; y++) {
-                for (int x = 0; x < this.gridSize; x++) {
+            for (int y = 0; y < Game.gridSize; y++) {
+                for (int x = 0; x < Game.gridSize; x++) {
                     final Cell cell = cells[y][x];
-                    final Game self = this;
 
                     if (!cell.isBomb) {
                         cell.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                self.computeNeighboringBombs(cell);
+                                Game.computeNeighboringBombs(cell);
                                 cell.reveal();
                                 cascade(cell);
+
+                                //FIXME: Pretty bad but cascades all the needed cells
+                                for(int y1 = 0; y1 < Game.gridSize; y1++){
+                                    for(int x1 = 0; x1 < Game.gridSize; x1++){
+                                        if(cells[y1][x1].isRevealed == true && "0".equals(cells[y1][x1].getText())){
+                                            cascade(cells[y1][x1]);
+                                        };
+                                    }
+                                }
                             }
                         });
                     }
