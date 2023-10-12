@@ -20,6 +20,7 @@ public class Minesweeper {
 
         void makeBomb() {
             this.isBomb = true;
+            setText("B");
         }
 
         void setNeighboringBombs(int neighboringBombs) {
@@ -78,13 +79,30 @@ public class Minesweeper {
             setVisible(true);
         }
 
+        private void populateBombs() {
+            Random random = new Random();
+            int remainingBombs = this.bombAmount;
+
+            while (remainingBombs > 0) {
+                int randomColumn = random.nextInt(this.gridSize);
+                int randomRow = random.nextInt(this.gridSize);
+                
+                if (this.cells[randomRow][randomColumn].isBomb) {
+                    continue;
+                }
+
+                this.cells[randomRow][randomColumn].makeBomb();
+                remainingBombs--;
+            }
+        }
+
         public Game(int gridSize, int bombAmount){
             this.cellSize = 35;
             this.gridSize = gridSize;
+            this.bombAmount = bombAmount;
             this.cells = new Cell[this.gridSize][this.gridSize];
 
             setSize(this.gridSize * this.cellSize, this.gridSize * this.cellSize);
-
             setLayout(new GridLayout(this.gridSize, this.gridSize));
 
             for (int row = 0; row < this.gridSize; row++) {
@@ -93,6 +111,8 @@ public class Minesweeper {
                     add(cells[row][col]);
                 }
             }
+
+            populateBombs();
         }
     }
 
