@@ -10,37 +10,40 @@ public class Minesweeper {
 
     // The size in pixels for the frame.
     private static final int WINDOW_SIZE = 500;
-    private JFrame  frame;
-
-    private final ActionListener actionListener = actionEvent -> {
-        Object source = actionEvent.getSource();
-    };
 
     private class Cell extends JButton {
         private final int row;
         private final int col;
-        private int value;
+        private int neighboringBombs;
+        private boolean isBomb;
+        private boolean isRevealed;
 
-        Cell(final int row, final int col,
-             final ActionListener actionListener) {
+        void makeBomb() {
+            this.isBomb = true;
+        }
+
+        void setNeighboringBombs(int neighboringBombs) {
+            this.neighboringBombs = neighboringBombs;
+        }
+
+        void reveal() {
+            this.isRevealed = true;
+            // do button stuff...
+        }
+
+        Cell(int row, int col) {
             this.row = row;
             this.col = col;
-            addActionListener(actionListener);
+
             setText("");
-        }
 
-        //TODO: For later implementations
-        /*int getValue() {
-            return value;
+            addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    // cell is clicked... 
+                }
+            });
         }
-
-        void setValue(int value) {
-            this.value = value;
-        }
-
-        boolean isAMine() {
-            return value == MINE;
-        }*/
 
         @Override
         public boolean equals(Object obj) {
@@ -58,46 +61,61 @@ public class Minesweeper {
         }
     }
   
-    private class Grid extends JFrame{
+    private class Game extends JFrame{
         private int gridSize;
         private int cellSize;
         private Cell[][] cells;
 
-        public Grid(int gridSize){
-            this.cellSize = 35;
-            this.gridSize = gridSize;
-            this.cells = new Cell[this.gridSize][this.gridSize];
+        private void stop() {
+            setVisible(false);
+            dispose();
+        }
 
-            //new JFrame("Minesweeper");
-            setSize(this.gridSize * this.cellSize, this.gridSize * this.cellSize);
-            //frame.setLayout(new BorderLayout());
-
-            //Container container = new Container();
-            setLayout(new GridLayout(this.gridSize, this.gridSize));
-
-            for (int row = 0; row < this.gridSize; row++) {
-                for (int col = 0; col < this.gridSize; col++) {
-                    cells[row][col] = new Cell(row, col, actionListener);
-                    add(cells[row][col]);
-                }
-            }
-            
-            //frame.add(container, BorderLayout.CENTER);
+        private void run() {
             setLocationRelativeTo(null);
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             setVisible(true);
         }
+
+        public Game(int gridSize){
+            this.cellSize = 35;
+            this.gridSize = gridSize;
+            this.cells = new Cell[this.gridSize][this.gridSize];
+
+            setSize(this.gridSize * this.cellSize, this.gridSize * this.cellSize);
+
+            setLayout(new GridLayout(this.gridSize, this.gridSize));
+
+            for (int row = 0; row < this.gridSize; row++) {
+                for (int col = 0; col < this.gridSize; col++) {
+                    cells[row][col] = new Cell(row, col);
+                    add(cells[row][col]);
+                }
+            }
+        }
     }
 
     private class Menu extends JFrame {
-        private int gridSize;
-        private Menu()
-        {
-            gridSize = 10;
-            setTitle("Game Frame");
+
+        private int selectedGridSize;
+        
+        private void run() {
+            setTitle("Menu");
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             setSize(WINDOW_SIZE, WINDOW_SIZE); // Set the frame size
             setLocationRelativeTo(null); // Center the frame on the screen
+                                         //
+            setVisible(true);
+        }
+
+        private void stop() {
+            setVisible(false);
+            dispose();
+        }
+
+        private Menu() {
+            // default grid size
+            this.selectedGridSize = 16;
 
             setLayout(new GridBagLayout());
             GridBagConstraints constraints = new GridBagConstraints();
@@ -105,7 +123,7 @@ public class Minesweeper {
 
             // Add a big label for the title
             JLabel titleLabel = new JLabel("Minesweeper");
-            titleLabel.setFont(new Font("Arial", Font.BOLD, 40)); // Set a larger font
+            titleLabel.setFont(new Font("Arial", Font.BOLD, 40));
 
             JLabel selectDifficultyLabel = new JLabel("Select Difficulty");
             selectDifficultyLabel.setFont(new Font("Arial", Font.ITALIC, 18));
@@ -119,7 +137,7 @@ public class Minesweeper {
 
             JPanel difficultyPanel = new JPanel();
 
-            JSlider difficultySlider = new JSlider(JSlider.HORIZONTAL, 5, 35, gridSize);
+            JSlider difficultySlider = new JSlider(JSlider.HORIZONTAL, 5, 35, this.selectedGridSize);
 
             JLabel difficultyValueLabel = new JLabel("Grid size: " + difficultySlider.getValue());
 
@@ -134,7 +152,6 @@ public class Minesweeper {
             constraints.gridx = 0;
             constraints.gridy = 2;
             add(selectDifficultyLabel, constraints);
-
             
             difficultyPanel.add(easyDifficultyButton);
             difficultyPanel.add(mediumDifficultyButton);
@@ -159,17 +176,14 @@ public class Minesweeper {
             difficultyValueLabel.setVisible(false);
             add(difficultyValueLabel, constraints);
 
-            setVisible(true);
-
-            JFrame frame = this;
+            Menu self = this;
             startGameButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                        //Calls grid and makes the grid/game window
-                        Minesweeper.Grid grid = minesweeper.new Grid(gridSize);
-                        //Closes menu screen
-                        frame.setVisible(false);
-                        frame.dispose();
+                        // Start game and stop menu
+                        Game game = new Game(self.selectedGridSize);
+                        game.run();
+                        self.stop();
                     }
             });
 
@@ -177,19 +191,19 @@ public class Minesweeper {
             easyDifficultyButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    gridSize = 8;
+                    self.selectedGridSize = 8;
                 }
             });
             mediumDifficultyButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    gridSize = 16;
+                    self.selectedGridSize = 16;
                 }
             });
             hardDifficultyButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    gridSize = 32;
+                    self.selectedGridSize = 32;
                 }
             });
             customDifficultyButton.addActionListener(new ActionListener() {
@@ -205,18 +219,15 @@ public class Minesweeper {
                 public void stateChanged(ChangeEvent e){
     
                     difficultyValueLabel.setText("Grid size: " + difficultySlider.getValue());
-                    gridSize = difficultySlider.getValue();
+                    self.selectedGridSize = difficultySlider.getValue();
                 }
             });
         }
     }
 
-    public static Minesweeper minesweeper;
     public static void main(String[] args) {
-
-        minesweeper = new Minesweeper();
+        Minesweeper minesweeper = new Minesweeper();
         Minesweeper.Menu menu = minesweeper.new Menu();
-
-        //Minesweeper.Grid grid = minesweeper.new Grid(gridSize);
+        menu.run();
     }
 }
