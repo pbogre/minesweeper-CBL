@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.swing.plaf.FontUIResource;
+
 import java.awt.*;
 import java.util.*;
 import java.awt.event.*;
@@ -84,10 +86,8 @@ public class Minesweeper {
             setVisible(true);
         }
     }
-    private class Menu extends JFrame {
 
-        JButton startGame = new JButton("Start game", null);
-        JButton selectDifficulty = new JButton("Select difficulty", null);
+    private class Menu extends JFrame {
 
         private Menu()
         {
@@ -104,37 +104,56 @@ public class Minesweeper {
             JLabel titleLabel = new JLabel("Minesweeper");
             titleLabel.setFont(new Font("Arial", Font.BOLD, 40)); // Set a larger font
 
+            JLabel selectDifficultyLabel = new JLabel("Select Difficulty");
+            selectDifficultyLabel.setFont(new Font("Arial", Font.ITALIC, 18));
+
+            JButton startGameButton = new JButton("Start Game");
+
+            JButton easyDifficultyButton = new JButton("Easy");
+            JButton mediumDifficultyButton = new JButton("Medium");
+            JButton hardDifficultyButton = new JButton("Hard");
+            JButton customDifficultyButton = new JButton("Custom");
+
             constraints.gridx = 0;
             constraints.gridy = 0;
             add(titleLabel, constraints);
 
-            JButton startGameButton = new JButton("Start Game");
-            JButton selectDifficultyButton = new JButton("Select Difficulty");
-
-            constraints.gridx = 0;
             constraints.gridy = 1;
             add(startGameButton, constraints);
 
             constraints.gridy = 2;
-            add(selectDifficultyButton, constraints);
+            add(selectDifficultyLabel, constraints);
+
+            constraints.gridy = 3;
+            constraints.gridx = -2;
+            add(easyDifficultyButton, constraints);
+
+            constraints.gridx = -1;
+            add(mediumDifficultyButton, constraints);
+
+            constraints.gridx = 1;
+            add(hardDifficultyButton, constraints);
+
+            constraints.gridx = 2;
+            add(customDifficultyButton, constraints);
 
             setVisible(true);
 
             JFrame frame = this;
             startGameButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+                @Override
+                public void actionPerformed(ActionEvent e) {
                         //Calls grid and makes the grid/game window
                         Minesweeper.Grid grid = minesweeper.new Grid(15);
                         //Closes menu screen
                         frame.setVisible(false);
                         frame.dispose();
-                }
+                    }
             });
             
-            //TODO: Select difficulty button functionality
         }
     }
+
     public static Minesweeper minesweeper;
     public static void main(String[] args) {
 
