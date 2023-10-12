@@ -60,22 +60,23 @@ public class Minesweeper {
   
     private class Grid extends JFrame{
         private int gridSize;
+        private int cellSize;
         private Cell[][] cells;
 
         public Grid(int gridSize){
-        
+            this.cellSize = 35;
             this.gridSize = gridSize;
-            this.cells = new Cell[gridSize][gridSize];
+            this.cells = new Cell[this.gridSize][this.gridSize];
 
             //new JFrame("Minesweeper");
-            setSize(WINDOW_SIZE, WINDOW_SIZE);
+            setSize(this.gridSize * this.cellSize, this.gridSize * this.cellSize);
             //frame.setLayout(new BorderLayout());
 
             //Container container = new Container();
-            setLayout(new GridLayout(gridSize, gridSize));
+            setLayout(new GridLayout(this.gridSize, this.gridSize));
 
-            for (int row = 0; row < gridSize; row++) {
-                for (int col = 0; col < gridSize; col++) {
+            for (int row = 0; row < this.gridSize; row++) {
+                for (int col = 0; col < this.gridSize; col++) {
                     cells[row][col] = new Cell(row, col, actionListener);
                     add(cells[row][col]);
                 }
@@ -95,7 +96,7 @@ public class Minesweeper {
             gridSize = 10;
             setTitle("Game Frame");
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            setSize(500, 500); // Set the frame size
+            setSize(WINDOW_SIZE, WINDOW_SIZE); // Set the frame size
             setLocationRelativeTo(null); // Center the frame on the screen
 
             setLayout(new GridBagLayout());
