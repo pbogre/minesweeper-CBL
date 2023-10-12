@@ -1,7 +1,6 @@
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.plaf.FontUIResource;
 
 import java.awt.*;
 import java.util.*;
@@ -173,6 +172,25 @@ public class Minesweeper {
                     }
             });
 
+            // difficulty inputs event listeners
+            easyDifficultyButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    gridSize = 8;
+                }
+            });
+            mediumDifficultyButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    gridSize = 16;
+                }
+            });
+            hardDifficultyButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    gridSize = 32;
+                }
+            });
             customDifficultyButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
