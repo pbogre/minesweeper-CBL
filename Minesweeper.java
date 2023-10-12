@@ -38,6 +38,9 @@ public class Minesweeper {
 
         void reveal() {
             this.isRevealed = true;
+            /*setIcon(new ImageIcon(new ImageIcon(
+                "C:/TUe/Homework/MineSweeperCBL/minesweeper-CBL/res/Minesweeper_1png.png").getImage()
+                .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH)));*/
             // do button stuff...
         }
 
@@ -61,6 +64,21 @@ public class Minesweeper {
         @Override
         public int hashCode() {
             return Objects.hash(row, col);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+
+            // Customize the appearance of the button to resemble a Minesweeper tile
+            if (isRevealed) {
+                setBackground(Color.GRAY);
+                setBorder(BorderFactory.createLoweredBevelBorder());
+            } 
+            else {
+                setBackground(Color.LIGHT_GRAY);
+                setBorder(BorderFactory.createRaisedBevelBorder());
+            }
         }
     }
   
@@ -158,7 +176,6 @@ public class Minesweeper {
                     }
                 }
             }
-
         }
     }
 
