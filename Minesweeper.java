@@ -152,6 +152,7 @@ public class Minesweeper {
             for (int y = 0; y < this.gridSize; y++) {
                 for (int x = 0; x < this.gridSize; x++) {
                     cells[y][x] = new Cell(y, x);
+                    cells[y][x].setFocusPainted(false);
                     add(cells[y][x]);
                 }
             }
