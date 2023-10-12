@@ -100,15 +100,22 @@ public class Minesweeper {
             GridBagConstraints constraints = new GridBagConstraints();
             constraints.insets = new Insets(10, 10, 10, 10);
 
+            // Add a big label for the title
+            JLabel titleLabel = new JLabel("Minesweeper");
+            titleLabel.setFont(new Font("Arial", Font.BOLD, 40)); // Set a larger font
+
+            constraints.gridx = 0;
+            constraints.gridy = 0;
+            add(titleLabel, constraints);
+
             JButton startGameButton = new JButton("Start Game");
             JButton selectDifficultyButton = new JButton("Select Difficulty");
 
             constraints.gridx = 0;
-            constraints.gridy = 0;
+            constraints.gridy = 1;
             add(startGameButton, constraints);
 
-            constraints.gridx = 0;
-            constraints.gridy = 1;
+            constraints.gridy = 2;
             add(selectDifficultyButton, constraints);
 
             setVisible(true);
