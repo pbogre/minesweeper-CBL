@@ -201,13 +201,16 @@ public class Minesweeper {
                                 Game.computeNeighboringBombs(cell);
                                 cell.reveal();
                                 cascade(cell);
-
+                                
                                 //FIXME: Pretty bad but cascades all the needed cells
-                                for(int y1 = 0; y1 < Game.gridSize; y1++){
-                                    for(int x1 = 0; x1 < Game.gridSize; x1++){
-                                        if(cells[y1][x1].isRevealed == true && "0".equals(cells[y1][x1].getText())){
-                                            cascade(cells[y1][x1]);
-                                        };
+                                for(int z = 0; z < 10; z++){
+                                    for(int y1 = 0; y1 < Game.gridSize; y1++){
+                                        for(int x1 = 0; x1 < Game.gridSize; x1++){
+                                            if(cells[y1][x1].isRevealed == true 
+                                                && cells[y1][x1].getNeighboringBombs(cells[y1][x1]) == 0){
+                                                cascade(cells[y1][x1]);
+                                            };
+                                        }
                                     }
                                 }
                             }
