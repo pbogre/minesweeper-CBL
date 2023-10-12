@@ -21,10 +21,19 @@ public class Minesweeper {
         void makeBomb() {
             this.isBomb = true;
             setText("B");
+
+            addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    // game lost
+                    System.out.println("You lose!");
+                }
+            });
         }
 
         void setNeighboringBombs(int neighboringBombs) {
             this.neighboringBombs = neighboringBombs;
+            setText(String.valueOf(this.neighboringBombs));
         }
 
         void reveal() {
@@ -37,13 +46,6 @@ public class Minesweeper {
             this.col = col;
 
             setText("");
-
-            addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    // cell is clicked... 
-                }
-            });
         }
 
         @Override
@@ -96,6 +98,30 @@ public class Minesweeper {
             }
         }
 
+        private void setNeighboringBombs(Cell cell) {
+
+            int neighboringBombs = 0;
+
+            for(int y = cell.row - 1; y <= cell.row + 1; y++) {
+                for(int x = cell.col - 1; x <= cell.col + 1; x++) {
+                    // skip if at selected cell
+                    if(y == cell.row && x == cell.col) {
+                        continue;
+                    }
+                    // skip out of bounds cases
+                    if(y < 0 || x < 0 || y >= this.gridSize || x >= this.gridSize) {
+                        continue;
+                    }
+
+                    if (this.cells[y][x].isBomb) {
+                        neighboringBombs++;
+                    }
+                }
+            }
+
+            cell.setNeighboringBombs(neighboringBombs);
+        }
+
         public Game(int gridSize, int bombAmount){
             this.cellSize = 35;
             this.gridSize = gridSize;
@@ -113,6 +139,26 @@ public class Minesweeper {
             }
 
             populateBombs();
+
+            // must be done after bomb population 
+            // as bombs have a separate action listener
+            for (int y = 0; y < this.gridSize; y++) {
+                for (int x = 0; x < this.gridSize; x++) {
+                    final Cell cell = cells[y][x];
+                    final Game self = this;
+
+                    if (!cell.isBomb) {
+                        cell.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                self.setNeighboringBombs(cell);
+                                cell.reveal();
+                            }
+                        });
+                    }
+                }
+            }
+
         }
     }
 
