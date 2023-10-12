@@ -99,6 +99,29 @@ public class Minesweeper {
             setVisible(true);
         }
 
+        private void cascade(Cell cell){
+                if(computeNeighboringBombs(cell) == 0){
+                
+                    for(int y = cell.row - 1; y <= cell.row + 1; y++) {
+                    for(int x = cell.col - 1; x <= cell.col + 1; x++) {
+                        // skip if at selected cell
+                        if(y == cell.row && x == cell.col) {
+                            continue;
+                        }
+                        // skip out of bounds cases
+                        if(y < 0 || x < 0 || y >= this.gridSize || x >= this.gridSize) {
+                            continue;
+                        }
+
+                        else{
+                            cells[y][x].reveal();
+                            cells[y][x].setText(String.valueOf(computeNeighboringBombs(cells[y][x])));
+                        }
+                    }
+                }
+            }
+        }
+
         private void populateBombs() {
             Random random = new Random();
             int remainingBombs = this.bombAmount;
@@ -116,7 +139,7 @@ public class Minesweeper {
             }
         }
 
-        private void computeNeighboringBombs(Cell cell) {
+        private int computeNeighboringBombs(Cell cell) {
 
             int neighboringBombs = 0;
 
@@ -136,8 +159,8 @@ public class Minesweeper {
                     }
                 }
             }
-
             cell.setNeighboringBombs(neighboringBombs);
+            return neighboringBombs;
         }
 
         public Game(int gridSize, int bombAmount){
@@ -172,6 +195,7 @@ public class Minesweeper {
                             public void actionPerformed(ActionEvent e) {
                                 self.computeNeighboringBombs(cell);
                                 cell.reveal();
+                                cascade(cell);
                             }
                         });
                     }
