@@ -10,37 +10,41 @@ public class Minesweeper {
 
     // The size in pixels for the frame.
     private static final int WINDOW_SIZE = 500;
-    private JFrame  frame;
-
-    private final ActionListener actionListener = actionEvent -> {
-        Object source = actionEvent.getSource();
-    };
 
     private class Cell extends JButton {
         private final int row;
         private final int col;
-        private int value;
+        private int neighboringBombs;
+        private boolean isBomb;
+        private boolean isRevealed;
 
-        Cell(final int row, final int col,
-             final ActionListener actionListener) {
+        void makeBomb() {
+            this.isBomb = true;
+            setText("B");
+        }
+
+        void setNeighboringBombs(int neighboringBombs) {
+            this.neighboringBombs = neighboringBombs;
+        }
+
+        void reveal() {
+            this.isRevealed = true;
+            // do button stuff...
+        }
+
+        Cell(int row, int col) {
             this.row = row;
             this.col = col;
-            addActionListener(actionListener);
+
             setText("");
-        }
 
-        //TODO: For later implementations
-        /*int getValue() {
-            return value;
+            addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    // cell is clicked... 
+                }
+            });
         }
-
-        void setValue(int value) {
-            this.value = value;
-        }
-
-        boolean isAMine() {
-            return value == MINE;
-        }*/
 
         @Override
         public boolean equals(Object obj) {
@@ -58,46 +62,82 @@ public class Minesweeper {
         }
     }
   
-    private class Grid extends JFrame{
+    private class Game extends JFrame{
         private int gridSize;
         private int cellSize;
+        private int bombAmount;
         private Cell[][] cells;
 
-        public Grid(int gridSize){
-            this.cellSize = 35;
-            this.gridSize = gridSize;
-            this.cells = new Cell[this.gridSize][this.gridSize];
+        private void stop() {
+            setVisible(false);
+            dispose();
+        }
 
-            //new JFrame("Minesweeper");
-            setSize(this.gridSize * this.cellSize, this.gridSize * this.cellSize);
-            //frame.setLayout(new BorderLayout());
-
-            //Container container = new Container();
-            setLayout(new GridLayout(this.gridSize, this.gridSize));
-
-            for (int row = 0; row < this.gridSize; row++) {
-                for (int col = 0; col < this.gridSize; col++) {
-                    cells[row][col] = new Cell(row, col, actionListener);
-                    add(cells[row][col]);
-                }
-            }
-            
-            //frame.add(container, BorderLayout.CENTER);
+        private void run() {
             setLocationRelativeTo(null);
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             setVisible(true);
         }
+
+        private void populateBombs() {
+            Random random = new Random();
+            int remainingBombs = this.bombAmount;
+
+            while (remainingBombs > 0) {
+                int randomColumn = random.nextInt(this.gridSize);
+                int randomRow = random.nextInt(this.gridSize);
+                
+                if (this.cells[randomRow][randomColumn].isBomb) {
+                    continue;
+                }
+
+                this.cells[randomRow][randomColumn].makeBomb();
+                remainingBombs--;
+            }
+        }
+
+        public Game(int gridSize, int bombAmount){
+            this.cellSize = 35;
+            this.gridSize = gridSize;
+            this.bombAmount = bombAmount;
+            this.cells = new Cell[this.gridSize][this.gridSize];
+
+            setSize(this.gridSize * this.cellSize, this.gridSize * this.cellSize);
+            setLayout(new GridLayout(this.gridSize, this.gridSize));
+
+            for (int row = 0; row < this.gridSize; row++) {
+                for (int col = 0; col < this.gridSize; col++) {
+                    cells[row][col] = new Cell(row, col);
+                    add(cells[row][col]);
+                }
+            }
+
+            populateBombs();
+        }
     }
 
     private class Menu extends JFrame {
-        private int gridSize;
-        private Menu()
-        {
-            gridSize = 10;
-            setTitle("Game Frame");
+
+        private int selectedGridSize;
+        private int selectedBombAmount;
+        
+        private void run() {
+            setTitle("Menu");
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             setSize(WINDOW_SIZE, WINDOW_SIZE); // Set the frame size
             setLocationRelativeTo(null); // Center the frame on the screen
+            setVisible(true);
+        }
+
+        private void stop() {
+            setVisible(false);
+            dispose();
+        }
+
+        private Menu() {
+            // default grid size & bomb amount
+            this.selectedGridSize = 16;
+            this.selectedBombAmount = 80;
 
             setLayout(new GridBagLayout());
             GridBagConstraints constraints = new GridBagConstraints();
@@ -105,7 +145,7 @@ public class Minesweeper {
 
             // Add a big label for the title
             JLabel titleLabel = new JLabel("Minesweeper");
-            titleLabel.setFont(new Font("Arial", Font.BOLD, 40)); // Set a larger font
+            titleLabel.setFont(new Font("Arial", Font.BOLD, 40));
 
             JLabel selectDifficultyLabel = new JLabel("Select Difficulty");
             selectDifficultyLabel.setFont(new Font("Arial", Font.ITALIC, 18));
@@ -119,9 +159,11 @@ public class Minesweeper {
 
             JPanel difficultyPanel = new JPanel();
 
-            JSlider difficultySlider = new JSlider(JSlider.HORIZONTAL, 5, 35, gridSize);
+            JSlider gridSizeSlider = new JSlider(JSlider.HORIZONTAL, 5, 35, this.selectedGridSize);
+            JSlider bombAmountSlider = new JSlider(JSlider.HORIZONTAL, 0, 99, this.selectedBombAmount);
 
-            JLabel difficultyValueLabel = new JLabel("Grid size: " + difficultySlider.getValue());
+            JLabel gridSizeLabel = new JLabel("Grid size: " + gridSizeSlider.getValue());
+            JLabel bombAmountLabel = new JLabel("Bomb / Cells: " + bombAmountSlider.getValue() + "% (" + this.selectedBombAmount + " total)");
 
             constraints.gridx = 0;
             constraints.gridy = 0;
@@ -134,7 +176,6 @@ public class Minesweeper {
             constraints.gridx = 0;
             constraints.gridy = 2;
             add(selectDifficultyLabel, constraints);
-
             
             difficultyPanel.add(easyDifficultyButton);
             difficultyPanel.add(mediumDifficultyButton);
@@ -147,29 +188,39 @@ public class Minesweeper {
 
             constraints.gridx = 0;
             constraints.gridy = 4;
-            difficultySlider.setMajorTickSpacing(10);
-            difficultySlider.setMinorTickSpacing(1);
-            difficultySlider.setPaintTicks(true);
-            difficultySlider.setPaintLabels(true);
-            difficultySlider.setVisible(false);
-            add(difficultySlider, constraints);
+            gridSizeSlider.setMajorTickSpacing(10);
+            gridSizeSlider.setMinorTickSpacing(1);
+            gridSizeSlider.setPaintTicks(true);
+            gridSizeSlider.setPaintLabels(true);
+            gridSizeSlider.setVisible(false);
+            add(gridSizeSlider, constraints);
 
             constraints.gridx = 0;
             constraints.gridy = 5;
-            difficultyValueLabel.setVisible(false);
-            add(difficultyValueLabel, constraints);
+            gridSizeLabel.setVisible(false);
+            add(gridSizeLabel, constraints);
 
-            setVisible(true);
+            constraints.gridx = 0;
+            constraints.gridy = 6;
+            bombAmountSlider.setMajorTickSpacing(33);
+            bombAmountSlider.setPaintTicks(true);
+            bombAmountSlider.setPaintLabels(true);
+            bombAmountSlider.setVisible(false);
+            add(bombAmountSlider, constraints);
 
-            JFrame frame = this;
+            constraints.gridx = 0;
+            constraints.gridy = 7;
+            bombAmountLabel.setVisible(false);
+            add(bombAmountLabel, constraints);
+
+            Menu self = this;
             startGameButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                        //Calls grid and makes the grid/game window
-                        Minesweeper.Grid grid = minesweeper.new Grid(gridSize);
-                        //Closes menu screen
-                        frame.setVisible(false);
-                        frame.dispose();
+                        // Start game and stop menu
+                        Game game = new Game(self.selectedGridSize, self.selectedBombAmount);
+                        game.run();
+                        self.stop();
                     }
             });
 
@@ -177,46 +228,59 @@ public class Minesweeper {
             easyDifficultyButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    gridSize = 8;
+                    self.selectedGridSize = 8;
+                    self.selectedBombAmount = 20;
                 }
             });
             mediumDifficultyButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    gridSize = 16;
+                    self.selectedGridSize = 16;
+                    self.selectedBombAmount = 80;
                 }
             });
             hardDifficultyButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    gridSize = 32;
+                    self.selectedGridSize = 32;
+                    self.selectedBombAmount = 350;
                 }
             });
             customDifficultyButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
 
-                        difficultySlider.setVisible(!difficultySlider.isVisible());
-                        difficultyValueLabel.setVisible(!difficultyValueLabel.isVisible());
+                        gridSizeSlider.setVisible(!gridSizeSlider.isVisible());
+                        gridSizeLabel.setVisible(!gridSizeLabel.isVisible());
+                        bombAmountSlider.setVisible(!bombAmountSlider.isVisible());
+                        bombAmountLabel.setVisible(!bombAmountLabel.isVisible());
                     }
             });
-            difficultySlider.addChangeListener(new ChangeListener() {
+            gridSizeSlider.addChangeListener(new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e){
     
-                    difficultyValueLabel.setText("Grid size: " + difficultySlider.getValue());
-                    gridSize = difficultySlider.getValue();
+                    gridSizeLabel.setText("Grid size: " + gridSizeSlider.getValue());
+                    self.selectedGridSize = gridSizeSlider.getValue();
+
+                    self.selectedBombAmount = (int)(self.selectedGridSize * selectedGridSize * (double)(bombAmountSlider.getValue() / 100.0));
+                    bombAmountLabel.setText("Bombs / Cells: " + bombAmountSlider.getValue() + "% (" + self.selectedBombAmount + " total)");
+                }
+            });
+            bombAmountSlider.addChangeListener(new ChangeListener() {
+                @Override
+                public void stateChanged(ChangeEvent e){
+    
+                    self.selectedBombAmount = (int)(self.selectedGridSize * selectedGridSize * (double)(bombAmountSlider.getValue() / 100.0));
+                    bombAmountLabel.setText("Bombs / Cells: " + bombAmountSlider.getValue() + "% (" + self.selectedBombAmount + " total)");
                 }
             });
         }
     }
 
-    public static Minesweeper minesweeper;
     public static void main(String[] args) {
-
-        minesweeper = new Minesweeper();
+        Minesweeper minesweeper = new Minesweeper();
         Minesweeper.Menu menu = minesweeper.new Menu();
-
-        //Minesweeper.Grid grid = minesweeper.new Grid(gridSize);
+        menu.run();
     }
 }
