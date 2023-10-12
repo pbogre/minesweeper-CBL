@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.plaf.FontUIResource;
 
 import java.awt.*;
@@ -88,9 +90,10 @@ public class Minesweeper {
     }
 
     private class Menu extends JFrame {
-
+        private int gridSize;
         private Menu()
         {
+            gridSize = 10;
             setTitle("Game Frame");
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             setSize(500, 500); // Set the frame size
@@ -114,28 +117,47 @@ public class Minesweeper {
             JButton hardDifficultyButton = new JButton("Hard");
             JButton customDifficultyButton = new JButton("Custom");
 
+            JPanel difficultyPanel = new JPanel();
+
+            JSlider difficultySlider = new JSlider(JSlider.HORIZONTAL, 5, 35, gridSize);
+
+            JLabel difficultyValueLabel = new JLabel("Grid size: " + difficultySlider.getValue());
+
             constraints.gridx = 0;
             constraints.gridy = 0;
             add(titleLabel, constraints);
 
+            constraints.gridx = 0;
             constraints.gridy = 1;
             add(startGameButton, constraints);
 
+            constraints.gridx = 0;
             constraints.gridy = 2;
             add(selectDifficultyLabel, constraints);
 
+            
+            difficultyPanel.add(easyDifficultyButton);
+            difficultyPanel.add(mediumDifficultyButton);
+            difficultyPanel.add(hardDifficultyButton);
+            difficultyPanel.add(customDifficultyButton);
+
+            constraints.gridx = 0;
             constraints.gridy = 3;
-            constraints.gridx = -2;
-            add(easyDifficultyButton, constraints);
+            add(difficultyPanel, constraints);
 
-            constraints.gridx = -1;
-            add(mediumDifficultyButton, constraints);
+            constraints.gridx = 0;
+            constraints.gridy = 4;
+            difficultySlider.setMajorTickSpacing(10);
+            difficultySlider.setMinorTickSpacing(1);
+            difficultySlider.setPaintTicks(true);
+            difficultySlider.setPaintLabels(true);
+            difficultySlider.setVisible(false);
+            add(difficultySlider, constraints);
 
-            constraints.gridx = 1;
-            add(hardDifficultyButton, constraints);
-
-            constraints.gridx = 2;
-            add(customDifficultyButton, constraints);
+            constraints.gridx = 0;
+            constraints.gridy = 5;
+            difficultyValueLabel.setVisible(false);
+            add(difficultyValueLabel, constraints);
 
             setVisible(true);
 
@@ -144,13 +166,29 @@ public class Minesweeper {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                         //Calls grid and makes the grid/game window
-                        Minesweeper.Grid grid = minesweeper.new Grid(15);
+                        Minesweeper.Grid grid = minesweeper.new Grid(gridSize);
                         //Closes menu screen
                         frame.setVisible(false);
                         frame.dispose();
                     }
             });
-            
+
+            customDifficultyButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+
+                        difficultySlider.setVisible(!difficultySlider.isVisible());
+                        difficultyValueLabel.setVisible(!difficultyValueLabel.isVisible());
+                    }
+            });
+            difficultySlider.addChangeListener(new ChangeListener() {
+                @Override
+                public void stateChanged(ChangeEvent e){
+    
+                    difficultyValueLabel.setText("Grid size: " + difficultySlider.getValue());
+                    gridSize = difficultySlider.getValue();
+                }
+            });
         }
     }
 
@@ -159,8 +197,7 @@ public class Minesweeper {
 
         minesweeper = new Minesweeper();
         Minesweeper.Menu menu = minesweeper.new Menu();
-        /*final int gridSize = 15; 
-        Minesweeper minesweeper = new Minesweeper();
-        Minesweeper.Grid grid = minesweeper.new Grid(gridSize);*/
+
+        //Minesweeper.Grid grid = minesweeper.new Grid(gridSize);
     }
 }
