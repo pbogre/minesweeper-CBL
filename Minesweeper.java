@@ -98,7 +98,7 @@ public class Minesweeper {
             }
         }
 
-        private void setNeighboringBombs(Cell cell) {
+        private void computeNeighboringBombs(Cell cell) {
 
             int neighboringBombs = 0;
 
@@ -131,10 +131,10 @@ public class Minesweeper {
             setSize(this.gridSize * this.cellSize, this.gridSize * this.cellSize);
             setLayout(new GridLayout(this.gridSize, this.gridSize));
 
-            for (int row = 0; row < this.gridSize; row++) {
-                for (int col = 0; col < this.gridSize; col++) {
-                    cells[row][col] = new Cell(row, col);
-                    add(cells[row][col]);
+            for (int y = 0; y < this.gridSize; y++) {
+                for (int x = 0; x < this.gridSize; x++) {
+                    cells[y][x] = new Cell(y, x);
+                    add(cells[y][x]);
                 }
             }
 
@@ -151,7 +151,7 @@ public class Minesweeper {
                         cell.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                self.setNeighboringBombs(cell);
+                                self.computeNeighboringBombs(cell);
                                 cell.reveal();
                             }
                         });
