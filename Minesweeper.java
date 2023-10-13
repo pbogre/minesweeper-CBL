@@ -201,7 +201,7 @@ public class Minesweeper {
             // must be done after bomb population 
             // as bombs have a separate action listener
             for (int y = 0; y < Game.gridSize; y++) {
-                for (int x = 0; x < Game.gridSize; x++) {
+                for (int x = 0; x < this.gridSize; x++) {
                     final Cell cell = cells[y][x];
 
                     if (!cell.isBomb) {
