@@ -32,11 +32,9 @@ public class Minesweeper {
         }
 
         void setNeighboringBombs(int neighboringBombs) {
-            
             this.neighboringBombs = neighboringBombs;
             setText(String.valueOf(this.neighboringBombs));
         }
-        
         void reveal() {
             this.isRevealed = true;
             /*setIcon(new ImageIcon(new ImageIcon(
@@ -115,7 +113,6 @@ public class Minesweeper {
             
             // Reveal the cell
             this.cells[row][col].reveal();
-            
 
             // If this cell has no adjacent mines, recursively reveal its neighbors
             if (computeNeighboringBombs(this.cells[row][col]) == 0) {
@@ -131,7 +128,6 @@ public class Minesweeper {
             }
         }
         
-
 
         private void populateBombs() {
             Random random = new Random();
