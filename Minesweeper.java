@@ -105,28 +105,38 @@ public class Minesweeper {
             setVisible(true);
         }
 
-        private void cascade(Cell cell){
-                if(computeNeighboringBombs(cell) == 0){
-                
-                    for(int y = cell.row - 1; y <= cell.row + 1; y++) {
-                    for(int x = cell.col - 1; x <= cell.col + 1; x++) {
-                        // skip if at selected cell
-                        if(y == cell.row && x == cell.col) {
-                            continue;
-                        }
-                        // skip out of bounds cases
-                        if(y < 0 || x < 0 || y >= Game.gridSize || x >= Game.gridSize) {
-                            continue;
-                        }
+        public void revealEmptyCells(int row, int col) {
+            // Check bounds to avoid array out-of-bounds exceptions
+            if (row < 0 || col < 0 || row >= Game.cells.length || col >= Game.cells[0].length) {
+                return;
+            }
+            
+            Cell cell = Game.cells[row][col];
+            
+            // Check if the cell is already revealed or contains a mine
+            if (cell.isRevealed || cell.isBomb) {
+                return;
+            }
+            
+            // Reveal the cell
+            Game.cells[row][col].reveal();
+            
 
-                        else{
-                            cells[y][x].reveal();
-                            cells[y][x].setText(String.valueOf(computeNeighboringBombs(cells[y][x])));
-                        }
-                    }
+            // If this cell has no adjacent mines, recursively reveal its neighbors
+            if (cell.getNeighboringBombs(Game.cells[row][col]) == 0) {
+                // Define relative positions of neighboring cells
+                int[] dr = {-1, -1, -1, 0, 1, 1, 1, 0};
+                int[] dc = {-1, 0, 1, 1, 1, 0, -1, -1};
+                
+                for (int i = 0; i < 8; i++) {
+                    int newRow = row + dr[i];
+                    int newCol = col + dc[i];
+                    revealEmptyCells(newRow, newCol); // Recursively check neighbors
                 }
             }
         }
+        
+
 
         private void populateBombs() {
             Random random = new Random();
@@ -195,24 +205,13 @@ public class Minesweeper {
                     final Cell cell = cells[y][x];
 
                     if (!cell.isBomb) {
+                        final int x2 = x;
+                        final int y2 = y;
                         cell.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 Game.computeNeighboringBombs(cell);
-                                cell.reveal();
-                                cascade(cell);
-                                
-                                //FIXME: Pretty bad but cascades all the needed cells
-                                for(int z = 0; z < 10; z++){
-                                    for(int y1 = 0; y1 < Game.gridSize; y1++){
-                                        for(int x1 = 0; x1 < Game.gridSize; x1++){
-                                            if(cells[y1][x1].isRevealed == true 
-                                                && cells[y1][x1].getNeighboringBombs(cells[y1][x1]) == 0){
-                                                cascade(cells[y1][x1]);
-                                            };
-                                        }
-                                    }
-                                }
+                                revealEmptyCells(y2, x2);
                             }
                         });
                     }
