@@ -92,7 +92,7 @@ public class Minesweeper {
         private static int gridSize;
         private int cellSize;
         private int bombAmount;
-        private static Cell[][] cells;
+        private Cell[][] cells;
 
         private void stop() {
             setVisible(false);
