@@ -37,11 +37,6 @@ public class Minesweeper {
             setText(String.valueOf(this.neighboringBombs));
         }
         
-        int getNeighboringBombs(Cell cell){
-
-            return Game.computeNeighboringBombs(cell);
-
-        }
         void reveal() {
             this.isRevealed = true;
             /*setIcon(new ImageIcon(new ImageIcon(
@@ -89,7 +84,7 @@ public class Minesweeper {
     }
   
     private class Game extends JFrame{
-        private static int gridSize;
+        private int gridSize;
         private int cellSize;
         private int bombAmount;
         private Cell[][] cells;
@@ -107,11 +102,11 @@ public class Minesweeper {
 
         public void revealEmptyCells(int row, int col) {
             // Check bounds to avoid array out-of-bounds exceptions
-            if (row < 0 || col < 0 || row >= Game.cells.length || col >= Game.cells[0].length) {
+            if (row < 0 || col < 0 || row >= this.cells.length || col >= this.cells[0].length) {
                 return;
             }
             
-            Cell cell = Game.cells[row][col];
+            Cell cell = this.cells[row][col];
             
             // Check if the cell is already revealed or contains a mine
             if (cell.isRevealed || cell.isBomb) {
@@ -119,7 +114,7 @@ public class Minesweeper {
             }
             
             // Reveal the cell
-            Game.cells[row][col].reveal();
+            this.cells[row][col].reveal();
             
 
             // If this cell has no adjacent mines, recursively reveal its neighbors
@@ -143,7 +138,7 @@ public class Minesweeper {
             int remainingBombs = this.bombAmount;
 
             while (remainingBombs > 0) {
-                int randomColumn = random.nextInt(Game.gridSize);
+                int randomColumn = random.nextInt(this.gridSize);
                 int randomRow = random.nextInt(this.gridSize);
                 
                 if (this.cells[randomRow][randomColumn].isBomb) {
@@ -155,7 +150,7 @@ public class Minesweeper {
             }
         }
 
-        private static int computeNeighboringBombs(Cell cell) {
+        private int computeNeighboringBombs(Cell cell) {
 
             int neighboringBombs = 0;
 
@@ -203,15 +198,16 @@ public class Minesweeper {
             for (int y = 0; y < this.gridSize; y++) {
                 for (int x = 0; x < this.gridSize; x++) {
                     final Cell cell = cells[y][x];
+                    final Game self = this;
 
                     if (!cell.isBomb) {
-                        final int x2 = x;
-                        final int y2 = y;
+                        final int finalX = x;
+                        final int finalY = y;
                         cell.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 self.computeNeighboringBombs(cell);
-                                revealEmptyCells(y2, x2);
+                                revealEmptyCells(finalY, finalX);
                             }
                         });
                     }
