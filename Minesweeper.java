@@ -123,7 +123,7 @@ public class Minesweeper {
             
 
             // If this cell has no adjacent mines, recursively reveal its neighbors
-            if (cell.getNeighboringBombs(Game.cells[row][col]) == 0) {
+            if (computeNeighboringBombs(this.cells[row][col]) == 0) {
                 // Define relative positions of neighboring cells
                 int[] dr = {-1, -1, -1, 0, 1, 1, 1, 0};
                 int[] dc = {-1, 0, 1, 1, 1, 0, -1, -1};
@@ -144,13 +144,13 @@ public class Minesweeper {
 
             while (remainingBombs > 0) {
                 int randomColumn = random.nextInt(Game.gridSize);
-                int randomRow = random.nextInt(Game.gridSize);
+                int randomRow = random.nextInt(this.gridSize);
                 
-                if (Game.cells[randomRow][randomColumn].isBomb) {
+                if (this.cells[randomRow][randomColumn].isBomb) {
                     continue;
                 }
 
-                Game.cells[randomRow][randomColumn].makeBomb();
+                this.cells[randomRow][randomColumn].makeBomb();
                 remainingBombs--;
             }
         }
@@ -166,11 +166,11 @@ public class Minesweeper {
                         continue;
                     }
                     // skip out of bounds cases
-                    if(y < 0 || x < 0 || y >= Game.gridSize || x >= Game.gridSize) {
+                    if(y < 0 || x < 0 || y >= this.gridSize || x >= this.gridSize) {
                         continue;
                     }
 
-                    if (Game.cells[y][x].isBomb) {
+                    if (this.cells[y][x].isBomb) {
                         neighboringBombs++;
                     }
                 }
@@ -181,15 +181,15 @@ public class Minesweeper {
 
         public Game(int gridSize, int bombAmount){
             this.cellSize = 35;
-            Game.gridSize = gridSize;
+            this.gridSize = gridSize;
             this.bombAmount = bombAmount;
-            Game.cells = new Cell[Game.gridSize][Game.gridSize];
+            this.cells = new Cell[this.gridSize][this.gridSize];
 
-            setSize(Game.gridSize * this.cellSize, Game.gridSize * this.cellSize);
-            setLayout(new GridLayout(Game.gridSize, Game.gridSize));
+            setSize(this.gridSize * this.cellSize, this.gridSize * this.cellSize);
+            setLayout(new GridLayout(this.gridSize, this.gridSize));
 
-            for (int y = 0; y < Game.gridSize; y++) {
-                for (int x = 0; x < Game.gridSize; x++) {
+            for (int y = 0; y < this.gridSize; y++) {
+                for (int x = 0; x < this.gridSize; x++) {
                     cells[y][x] = new Cell(y, x);
                     cells[y][x].setFocusPainted(false);
                     add(cells[y][x]);
@@ -200,7 +200,7 @@ public class Minesweeper {
 
             // must be done after bomb population 
             // as bombs have a separate action listener
-            for (int y = 0; y < Game.gridSize; y++) {
+            for (int y = 0; y < this.gridSize; y++) {
                 for (int x = 0; x < this.gridSize; x++) {
                     final Cell cell = cells[y][x];
 
@@ -210,7 +210,7 @@ public class Minesweeper {
                         cell.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                Game.computeNeighboringBombs(cell);
+                                self.computeNeighboringBombs(cell);
                                 revealEmptyCells(y2, x2);
                             }
                         });
