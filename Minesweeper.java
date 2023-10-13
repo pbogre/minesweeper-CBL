@@ -35,9 +35,11 @@ public class Minesweeper {
             this.neighboringBombs = neighboringBombs;
             setText(String.valueOf(this.neighboringBombs));
         }
-
         void reveal() {
             this.isRevealed = true;
+            /*setIcon(new ImageIcon(new ImageIcon(
+                "C:/TUe/Homework/MineSweeperCBL/minesweeper-CBL/res/Minesweeper_1png.png").getImage()
+                .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH)));*/
             // do button stuff...
         }
 
@@ -61,6 +63,21 @@ public class Minesweeper {
         @Override
         public int hashCode() {
             return Objects.hash(row, col);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+
+            // Customize the appearance of the button to resemble a Minesweeper tile
+            if (isRevealed) {
+                setBackground(Color.GRAY);
+                setBorder(BorderFactory.createLoweredBevelBorder());
+            } 
+            else {
+                setBackground(Color.LIGHT_GRAY);
+                setBorder(BorderFactory.createRaisedBevelBorder());
+            }
         }
     }
   
@@ -104,12 +121,12 @@ public class Minesweeper {
 
             for(int y = cell.row - 1; y <= cell.row + 1; y++) {
                 for(int x = cell.col - 1; x <= cell.col + 1; x++) {
-                    // skip if at selected cell
-                    if(y == cell.row && x == cell.col) {
+                    // skip out of bounds
+                    if(y < 0 || x < 0 || y >= this.gridSize || x >= this.gridSize) {
                         continue;
                     }
-                    // skip out of bounds cases
-                    if(y < 0 || x < 0 || y >= this.gridSize || x >= this.gridSize) {
+                    // skip if cell is revealed
+                    if(this.cells[y][x].isRevealed) {
                         continue;
                     }
 
@@ -120,6 +137,33 @@ public class Minesweeper {
             }
 
             cell.setNeighboringBombs(neighboringBombs);
+
+            // If this cell has no adjacent mines, recursively reveal its neighbors
+            if (neighboringBombs == 0) {               
+                // Define relative positions of neighboring cells
+                int[] dy = {-1, -1, -1,  0,  1,  1,  1,  0};
+                int[] dx = {-1,  0,  1,  1,  1,  0, -1, -1};
+                
+                for (int i = 0; i < 8; i++) {
+                    int currentRow = cell.row + dy[i];
+                    int currentCol = cell.col + dx[i];
+
+                    // skip out of bounds
+                    if (currentRow < 0 || currentCol < 0 || currentRow >= this.gridSize || currentCol >= this.gridSize) {
+                        continue;
+                    }
+
+                    Cell currentCell = this.cells[currentRow][currentCol];
+
+                    // skip if cell is revealed
+                    if (currentCell.isRevealed) {
+                        continue;
+                    }
+
+                    currentCell.reveal();
+                    computeNeighboringBombs(currentCell);
+                }
+            }
         }
 
         public Game(int gridSize, int bombAmount){
@@ -134,6 +178,7 @@ public class Minesweeper {
             for (int y = 0; y < this.gridSize; y++) {
                 for (int x = 0; x < this.gridSize; x++) {
                     cells[y][x] = new Cell(y, x);
+                    cells[y][x].setFocusPainted(false);
                     add(cells[y][x]);
                 }
             }
@@ -151,14 +196,13 @@ public class Minesweeper {
                         cell.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                self.computeNeighboringBombs(cell);
                                 cell.reveal();
+                                self.computeNeighboringBombs(cell);
                             }
                         });
                     }
                 }
             }
-
         }
     }
 
