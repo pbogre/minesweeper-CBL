@@ -98,26 +98,19 @@ public class Minesweeper {
             }
         }
 
-        private void computeNeighboringBombs(Cell cell, ArrayList<int[]> coordinatesBlacklist) {
+        private void computeNeighboringBombs(Cell cell) {
 
             int neighboringBombs = 0;
 
             for(int y = cell.row - 1; y <= cell.row + 1; y++) {
-                columnLoop:
                 for(int x = cell.col - 1; x <= cell.col + 1; x++) {
-                    // skip if at selected cell
-                    if(y == cell.row && x == cell.col) {
-                        continue;
-                    }
                     // skip out of bounds cases
                     if(y < 0 || x < 0 || y >= this.gridSize || x >= this.gridSize) {
                         continue;
                     }
-                    // skip if in coordinate blacklist
-                    for(int[] coordinate : coordinatesBlacklist) {
-                       if (coordinate[0] == x && coordinate[1] == y) {
-                           continue columnLoop;
-                       }
+                    // skip if is revealed
+                    if (this.cells[y][x].isRevealed) {
+                        continue;
                     }
 
                     if (this.cells[y][x].isBomb) {
@@ -130,28 +123,20 @@ public class Minesweeper {
             // if no neighboring bombs, recursively compute & reveal
             // all neighboring cells 
             if (neighboringBombs == 0) {
-                coordinatesBlacklist.add(new int[]{cell.col, cell.row});
 
                 for(int y = cell.row - 1; y <= cell.row + 1; y++) {
-                    columnLoop:
                     for(int x = cell.col - 1; x <= cell.col + 1; x++) {
-                        // skip if at selected cell
-                        if(y == cell.row && x == cell.col) {
-                            continue;
-                        }
                         // skip if out of bounds cases
                         if(y < 0 || x < 0 || y >= this.gridSize || x >= this.gridSize) {
                             continue;
                         }
-                        // skip if in coordinate blacklist
-                        for(int[] coordinate : coordinatesBlacklist) {
-                           if (coordinate[0] == x && coordinate[1] == y) {
-                               continue columnLoop;
-                           }
-                        }
+                        // skip if is revealed
+                       if (this.cells[y][x].isRevealed) {
+                           continue;
+                       }
 
-                        computeNeighboringBombs(this.cells[y][x], coordinatesBlacklist);
                         this.cells[y][x].reveal();
+                        computeNeighboringBombs(this.cells[y][x]);
                     }
                 }
             }
@@ -186,8 +171,8 @@ public class Minesweeper {
                         cell.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                self.computeNeighboringBombs(cell, new ArrayList<int[]>());
                                 cell.reveal();
+                                self.computeNeighboringBombs(cell);
                             }
                         });
                     }
