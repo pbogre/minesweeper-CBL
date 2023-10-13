@@ -161,7 +161,7 @@ public class Minesweeper {
                     }
 
                     currentCell.reveal();
-                    computeNeighboringBombs(this.cells[currentRow][currentCol]);
+                    computeNeighboringBombs(currentCell);
                 }
             }
         }
