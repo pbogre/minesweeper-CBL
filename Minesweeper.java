@@ -1,6 +1,7 @@
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.MouseInputAdapter;
 
 import java.awt.*;
 import java.util.*;
@@ -16,36 +17,53 @@ public class Minesweeper {
         private final int col;
         private int neighboringBombs;
         private boolean isBomb;
+        private boolean isFlagged;
         private boolean isRevealed;
 
         void makeBomb() {
             this.isBomb = true;
-            setText("B");
-
-            addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    // game lost
-                    System.out.println("You lose!");
-                }
-            });
+            //setText("B");
         }
 
         void setNeighboringBombs(int neighboringBombs) {
             this.neighboringBombs = neighboringBombs;
-            setText(String.valueOf(this.neighboringBombs));
+            if(this.neighboringBombs != 0) {
+                setText(String.valueOf(this.neighboringBombs));
+            }
         }
+
         void reveal() {
             this.isRevealed = true;
+
+            if(this.isBomb && !this.isFlagged) {
+                setText("B");
+                return;
+            }
+
+            if(!this.isFlagged){
+                setBackground(Color.GRAY);
+                setBorder(BorderFactory.createLoweredBevelBorder());
+            }
+
             /*setIcon(new ImageIcon(new ImageIcon(
                 "C:/TUe/Homework/MineSweeperCBL/minesweeper-CBL/res/Minesweeper_1png.png").getImage()
                 .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH)));*/
             // do button stuff...
         }
 
+        void flag() {
+            if (!this.isRevealed) {
+                this.isFlagged = true;
+                setText("F");
+            }
+        }
+
         Cell(int row, int col) {
             this.row = row;
             this.col = col;
+
+            setBackground(Color.LIGHT_GRAY);
+            setBorder(BorderFactory.createRaisedBevelBorder());
 
             setText("");
         }
@@ -64,24 +82,10 @@ public class Minesweeper {
         public int hashCode() {
             return Objects.hash(row, col);
         }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-
-            // Customize the appearance of the button to resemble a Minesweeper tile
-            if (isRevealed) {
-                setBackground(Color.GRAY);
-                setBorder(BorderFactory.createLoweredBevelBorder());
-            } 
-            else {
-                setBackground(Color.LIGHT_GRAY);
-                setBorder(BorderFactory.createRaisedBevelBorder());
-            }
-        }
     }
   
     private class Game extends JFrame{
+        private boolean gameOver;
         private int gridSize;
         private int cellSize;
         private int bombAmount;
@@ -96,6 +100,16 @@ public class Minesweeper {
             setLocationRelativeTo(null);
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             setVisible(true);
+        }
+
+        private void revealBombs() {
+            for(int y = 0; y < this.gridSize; y++) {
+                for(int x = 0; x < this.gridSize; x++) {
+                    if(this.cells[y][x].isBomb) {
+                        this.cells[y][x].reveal();
+                    }
+                }
+            }
         }
 
         private void populateBombs() {
@@ -116,6 +130,10 @@ public class Minesweeper {
         }
 
         private void computeNeighboringBombs(Cell cell) {
+
+            if(cell.isBomb) {
+                return;
+            }
 
             int neighboringBombs = 0;
 
@@ -167,6 +185,7 @@ public class Minesweeper {
         }
 
         public Game(int gridSize, int bombAmount){
+            this.gameOver = false;
             this.cellSize = 35;
             this.gridSize = gridSize;
             this.bombAmount = bombAmount;
@@ -178,31 +197,41 @@ public class Minesweeper {
             for (int y = 0; y < this.gridSize; y++) {
                 for (int x = 0; x < this.gridSize; x++) {
                     cells[y][x] = new Cell(y, x);
-                    cells[y][x].setFocusPainted(false);
-                    add(cells[y][x]);
+                    Cell currentCell = this.cells[y][x];
+                    currentCell.setFocusPainted(false);
+
+                    Game self = this;
+                    currentCell.addMouseListener(new MouseListener() {
+                        public void mouseClicked(MouseEvent me) {
+                            if(self.gameOver) {
+                                return;
+                            }
+
+                            if (SwingUtilities.isRightMouseButton(me)) {
+                                currentCell.flag();
+                            }
+                            if (SwingUtilities.isLeftMouseButton(me)) {
+                                if(currentCell.isBomb) {
+                                    self.gameOver = true;
+                                    self.revealBombs();
+                                    return;
+                                }
+
+                                currentCell.reveal();
+                                self.computeNeighboringBombs(currentCell);
+                            }
+                        }
+                        public void mousePressed(MouseEvent me) {}
+                        public void mouseReleased(MouseEvent me) {}
+                        public void mouseEntered(MouseEvent me) {}
+                        public void mouseExited(MouseEvent me) {}
+                    });
+
+                    add(currentCell);
                 }
             }
 
             populateBombs();
-
-            // must be done after bomb population 
-            // as bombs have a separate action listener
-            for (int y = 0; y < this.gridSize; y++) {
-                for (int x = 0; x < this.gridSize; x++) {
-                    final Cell cell = cells[y][x];
-                    final Game self = this;
-
-                    if (!cell.isBomb) {
-                        cell.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                cell.reveal();
-                                self.computeNeighboringBombs(cell);
-                            }
-                        });
-                    }
-                }
-            }
         }
     }
 
