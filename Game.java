@@ -1,8 +1,9 @@
 import javax.swing.*;
 
 import java.awt.*;
-import java.util.*;
 import java.awt.event.*;
+
+import java.util.*;
 
 public class Game extends JFrame{
     public boolean firstCellRevealed;
@@ -11,6 +12,8 @@ public class Game extends JFrame{
     public int cellSize;
     public int bombAmount;
     public Cell[][] cells;
+
+    public Solver solver;
 
     public void stop() {
         setVisible(false);
@@ -119,6 +122,8 @@ public class Game extends JFrame{
         this.bombAmount = bombAmount;
         this.cells = new Cell[this.gridSize][this.gridSize];
 
+        this.solver = new Solver(this);
+
         setSize(this.gridSize * this.cellSize, this.gridSize * this.cellSize);
         setLayout(new GridLayout(this.gridSize, this.gridSize));
 
@@ -155,6 +160,15 @@ public class Game extends JFrame{
 
                             currentCell.reveal();
                             self.computeNeighboringBombs(currentCell);
+
+                            ArrayList<ArrayList<Cell>> solvedSituation = solver.solveSituation();
+                            for(Cell safe : solvedSituation.get(0)) {
+                                safe.markSafe();
+                            }
+                            for(Cell bomb : solvedSituation.get(1)) {
+                                bomb.markBomb();
+                            }
+
                         }
                     }
                     public void mousePressed(MouseEvent me) {}

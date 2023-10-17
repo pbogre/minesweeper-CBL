@@ -1,6 +1,8 @@
 import javax.swing.*;
+import javax.swing.plaf.ColorUIResource;
 
 import java.awt.*;
+
 import java.util.*;
 
 public class Cell extends JButton {
@@ -10,6 +12,22 @@ public class Cell extends JButton {
     public boolean isBomb;
     public boolean isFlagged;
     public boolean isRevealed;
+
+    void markUnknown() {
+        setBackground(new ColorUIResource(255, 255, 0));
+    }
+
+    void markSource() {
+        setBackground(new ColorUIResource(0, 0, 255));
+    }
+
+    void markSafe() {
+        setBackground(new ColorUIResource(0, 255, 0));
+    }
+
+    void markBomb() {
+        setBackground(new ColorUIResource(255, 0, 0));
+    }
 
     void makeBomb() {
         this.isBomb = true;
