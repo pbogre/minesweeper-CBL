@@ -164,21 +164,22 @@ public class Game extends JFrame{
                             currentCell.toggleFlag();
                         }
                         if (SwingUtilities.isLeftMouseButton(me)) {
-                            if(!firstCellRevealed) {
-                                self.populateBombs(currentCell);
-                                currentCell.reveal();
-                                firstCellRevealed = true;
+                            if(currentCell.isFlagged) {
+                                return;
                             }
-
                             if(currentCell.isBomb) {
                                 self.gameOver = true;
                                 self.revealBombs();
                                 return;
                             }
-                            else if(!currentCell.isFlagged){
-                                currentCell.reveal();
-                                self.computeNeighboringBombs(currentCell);
+
+                            if(!firstCellRevealed) {
+                                self.populateBombs(currentCell);
+                                firstCellRevealed = true;
                             }
+
+                            currentCell.reveal();
+                            self.computeNeighboringBombs(currentCell);
                         }
                     }
                     public void mousePressed(MouseEvent me) {}
