@@ -114,6 +114,26 @@ public class Game extends JFrame{
         }
     }
 
+    // TODO stop recursing when game is won / newlyFoundSafe = 0
+    void solveSituation() {
+        ArrayList<ArrayList<Cell>> solvedSituation = solver.solveSituation();
+        for(Cell safe : solvedSituation.get(0)) {
+            if(!this.cells[safe.row][safe.col].isRevealed) {
+                safe.markSafe();
+
+                this.cells[safe.row][safe.col].reveal();
+                this.computeNeighboringBombs(this.cells[safe.row][safe.col]);
+
+                this.solveSituation();
+            }
+        }
+        for(Cell bomb : solvedSituation.get(1)) {
+            if(!this.cells[bomb.row][bomb.col].isRevealed) {
+                bomb.markBomb();
+            }
+        }
+    }
+
     public Game(int gridSize, int bombAmount){
         this.firstCellRevealed = false;
         this.gameOver = false;
@@ -163,19 +183,7 @@ public class Game extends JFrame{
 
                             currentCell.reveal();
                             self.computeNeighboringBombs(currentCell);
-
-                            ArrayList<ArrayList<Cell>> solvedSituation = solver.solveSituation();
-                            for(Cell safe : solvedSituation.get(0)) {
-                                if(!self.cells[safe.row][safe.col].isRevealed) {
-                                    safe.markSafe();
-                                }
-                            }
-                            for(Cell bomb : solvedSituation.get(1)) {
-                                if(!self.cells[bomb.row][bomb.col].isRevealed) {
-                                    bomb.markBomb();
-                                }
-                            }
-
+                            self.solveSituation();
                         }
                     }
                     public void mousePressed(MouseEvent me) {}
