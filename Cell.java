@@ -24,35 +24,35 @@ public class Cell extends JButton {
                 //TODO: Add the additional 7 pictures/resources
                 case 1:
                     icon = new ImageIcon(getClass().getResource("/res/Minesweeper_1.png"));
-                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(25, 25, java.awt.Image.SCALE_SMOOTH)));
+                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
                     break;
                 case 2:
-                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_1.png"));
-                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(25, 25, java.awt.Image.SCALE_SMOOTH)));
+                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_2.png"));
+                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
                     break;
                 case 3:
-                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_1.png"));
-                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(25, 25, java.awt.Image.SCALE_SMOOTH)));
+                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_3.png"));
+                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
                     break;
                 case 4:
-                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_1.png"));
-                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(25, 25, java.awt.Image.SCALE_SMOOTH)));
+                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_4.png"));
+                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
                     break;
                 case 5:
-                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_1.png"));
-                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(25, 25, java.awt.Image.SCALE_SMOOTH)));
+                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_5.png"));
+                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
                     break;
                 case 6:
-                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_1.png"));
-                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(25, 25, java.awt.Image.SCALE_SMOOTH)));
+                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_6.png"));
+                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
                     break;
                 case 7:
-                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_1.png"));
-                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(25, 25, java.awt.Image.SCALE_SMOOTH)));
+                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_7.png"));
+                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
                     break;
                 case 8:
-                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_1.png"));
-                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(25, 25, java.awt.Image.SCALE_SMOOTH)));
+                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_8.png"));
+                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
                     break;
                 default:
                     return;
@@ -64,7 +64,9 @@ public class Cell extends JButton {
         this.isRevealed = true;
 
         if(this.isBomb && !this.isFlagged) {
-            setText("B");
+            ImageIcon icon = new ImageIcon(getClass().getResource("/res/Minesweeper_Bomb.png"));
+            setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
+            //setText("B");
             return;
         }
 
@@ -78,7 +80,11 @@ public class Cell extends JButton {
     void flag() {
         if (!this.isRevealed) {
             this.isFlagged = true;
-            setText("F");
+
+            ImageIcon icon = new ImageIcon(getClass().getResource("/res/Minesweeper_flag.png"));
+            setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
+            
+            //setText("F");
         }
     }
 
