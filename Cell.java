@@ -13,7 +13,7 @@ public class Cell extends JButton {
 
     void makeBomb() {
         this.isBomb = true;
-        setText("B");
+        //setText("B");
     }
 
     void setNeighboringBombs(int neighboringBombs) {
@@ -65,7 +65,6 @@ public class Cell extends JButton {
         if(this.isBomb && !this.isFlagged) {
             ImageIcon icon = new ImageIcon(getClass().getResource("/res/Minesweeper_Bomb.png"));
             setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
-            //setText("B");
             return;
         }
 
@@ -73,24 +72,23 @@ public class Cell extends JButton {
             setBackground(Color.GRAY);
             setBorder(BorderFactory.createLoweredBevelBorder());
         }
-        // do button stuff...
     }
 
-    void flag() {
-        if (!this.isRevealed) {
+    void toggleFlag() {
+        if(this.isRevealed){
+            return;
+        }
+
+        if (!this.isFlagged) {
             this.isFlagged = true;
 
             ImageIcon icon = new ImageIcon(getClass().getResource("/res/Minesweeper_flag.png"));
             setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
-
-            //setText("F");
         }
-    }
-    void unflag(){
-        if(!this.isRevealed){
+        else if(this.isFlagged){
             this.isFlagged = false;
+            setIcon(null);
         }
-        setIcon(null);
     }
 
     Cell(int row, int col) {

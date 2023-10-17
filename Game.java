@@ -128,12 +128,7 @@ public class Game extends JFrame{
                         }
 
                         if (SwingUtilities.isRightMouseButton(me)) {
-                            if(currentCell.isFlagged){
-                                currentCell.unflag();
-                            }
-                            else{
-                               currentCell.flag();
-                            }
+                            currentCell.toggleFlag();
                         }
                         if (SwingUtilities.isLeftMouseButton(me)) {
                             if(currentCell.isBomb) {
@@ -141,9 +136,10 @@ public class Game extends JFrame{
                                 self.revealBombs();
                                 return;
                             }
-
-                            currentCell.reveal();
-                            self.computeNeighboringBombs(currentCell);
+                            else if(!currentCell.isFlagged){
+                                currentCell.reveal();
+                                self.computeNeighboringBombs(currentCell);
+                            }
                         }
                     }
                     public void mousePressed(MouseEvent me) {}
