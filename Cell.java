@@ -17,9 +17,46 @@ public class Cell extends JButton {
     }
 
     void setNeighboringBombs(int neighboringBombs) {
+        ImageIcon icon;
         this.neighboringBombs = neighboringBombs;
         if(this.neighboringBombs != 0) {
-            setText(String.valueOf(this.neighboringBombs));
+            switch(neighboringBombs){
+                //TODO: Add the additional 7 pictures/resources
+                case 1:
+                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_1.png"));
+                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(25, 25, java.awt.Image.SCALE_SMOOTH)));
+                    break;
+                case 2:
+                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_1.png"));
+                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(25, 25, java.awt.Image.SCALE_SMOOTH)));
+                    break;
+                case 3:
+                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_1.png"));
+                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(25, 25, java.awt.Image.SCALE_SMOOTH)));
+                    break;
+                case 4:
+                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_1.png"));
+                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(25, 25, java.awt.Image.SCALE_SMOOTH)));
+                    break;
+                case 5:
+                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_1.png"));
+                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(25, 25, java.awt.Image.SCALE_SMOOTH)));
+                    break;
+                case 6:
+                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_1.png"));
+                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(25, 25, java.awt.Image.SCALE_SMOOTH)));
+                    break;
+                case 7:
+                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_1.png"));
+                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(25, 25, java.awt.Image.SCALE_SMOOTH)));
+                    break;
+                case 8:
+                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_1.png"));
+                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(25, 25, java.awt.Image.SCALE_SMOOTH)));
+                    break;
+                default:
+                    return;
+            }
         }
     }
 
@@ -35,10 +72,6 @@ public class Cell extends JButton {
             setBackground(Color.GRAY);
             setBorder(BorderFactory.createLoweredBevelBorder());
         }
-
-        /*setIcon(new ImageIcon(new ImageIcon(
-            "C:/TUe/Homework/MineSweeperCBL/minesweeper-CBL/res/Minesweeper_1png.png").getImage()
-            .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH)));*/
         // do button stuff...
     }
 
