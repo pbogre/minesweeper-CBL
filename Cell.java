@@ -13,7 +13,7 @@ public class Cell extends JButton {
 
     void makeBomb() {
         this.isBomb = true;
-        //setText("B");
+        setText("B");
     }
 
     void setNeighboringBombs(int neighboringBombs) {
@@ -21,7 +21,6 @@ public class Cell extends JButton {
         this.neighboringBombs = neighboringBombs;
         if(this.neighboringBombs != 0) {
             switch(neighboringBombs){
-                //TODO: Add the additional 7 pictures/resources
                 case 1:
                     icon = new ImageIcon(getClass().getResource("/res/Minesweeper_1.png"));
                     setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
@@ -83,9 +82,15 @@ public class Cell extends JButton {
 
             ImageIcon icon = new ImageIcon(getClass().getResource("/res/Minesweeper_flag.png"));
             setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
-            
+
             //setText("F");
         }
+    }
+    void unflag(){
+        if(!this.isRevealed){
+            this.isFlagged = false;
+        }
+        setIcon(null);
     }
 
     Cell(int row, int col) {

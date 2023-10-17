@@ -128,7 +128,12 @@ public class Game extends JFrame{
                         }
 
                         if (SwingUtilities.isRightMouseButton(me)) {
-                            currentCell.flag();
+                            if(currentCell.isFlagged){
+                                currentCell.unflag();
+                            }
+                            else{
+                               currentCell.flag();
+                            }
                         }
                         if (SwingUtilities.isLeftMouseButton(me)) {
                             if(currentCell.isBomb) {
