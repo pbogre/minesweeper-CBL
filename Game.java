@@ -118,9 +118,26 @@ public class Game extends JFrame{
         this.gridSize = gridSize;
         this.bombAmount = bombAmount;
         this.cells = new Cell[this.gridSize][this.gridSize];
+        JPanel mineFieldPanel = new JPanel();
+        JPanel gameStatsPanel = new JPanel();
 
-        setSize(this.gridSize * this.cellSize, this.gridSize * this.cellSize);
-        setLayout(new GridLayout(this.gridSize, this.gridSize));
+        setLayout(new GridBagLayout());
+        setSize(this.gridSize * this.cellSize, (this.gridSize * this.cellSize) + 150);
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(10, 10, 10, 10);
+
+        mineFieldPanel.setSize(this.gridSize * this.cellSize, this.gridSize * this.cellSize);
+        mineFieldPanel.setLayout(new GridLayout(this.gridSize, this.gridSize));
+
+        gameStatsPanel.setSize(this.gridSize * this.cellSize, 150);
+
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        add(gameStatsPanel, constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        add(mineFieldPanel, constraints);
 
         for (int y = 0; y < this.gridSize; y++) {
             for (int x = 0; x < this.gridSize; x++) {
@@ -162,7 +179,7 @@ public class Game extends JFrame{
                     public void mouseExited(MouseEvent me) {}
                 });
 
-                add(currentCell);
+                mineFieldPanel.add(currentCell);
             }
         }
     }
