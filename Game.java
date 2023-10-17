@@ -5,6 +5,7 @@ import java.util.*;
 import java.awt.event.*;
 
 public class Game extends JFrame{
+    public boolean firstCellRevealed;
     public boolean gameOver;
     public int gridSize;
     public int cellSize;
@@ -32,19 +33,25 @@ public class Game extends JFrame{
         }
     }
 
-    public void populateBombs() {
+    public void populateBombs(Cell exceptionCell) {
         Random random = new Random();
         int remainingBombs = this.bombAmount;
 
         while (remainingBombs > 0) {
             int randomColumn = random.nextInt(this.gridSize);
             int randomRow = random.nextInt(this.gridSize);
-            
-            if (this.cells[randomRow][randomColumn].isBomb) {
+            Cell randomCell = this.cells[randomRow][randomColumn];
+           
+            // skip if already bomb
+            if (randomCell.isBomb) {
+                continue;
+            }
+            // skip if is exception cell (first cell revealed)
+            if (randomCell.row == exceptionCell.row && randomCell.col == exceptionCell.col) {
                 continue;
             }
 
-            this.cells[randomRow][randomColumn].makeBomb();
+            randomCell.makeBomb();
             remainingBombs--;
         }
     }
@@ -105,6 +112,7 @@ public class Game extends JFrame{
     }
 
     public Game(int gridSize, int bombAmount){
+        this.firstCellRevealed = false;
         this.gameOver = false;
         this.cellSize = 35;
         this.gridSize = gridSize;
@@ -131,6 +139,12 @@ public class Game extends JFrame{
                             currentCell.flag();
                         }
                         if (SwingUtilities.isLeftMouseButton(me)) {
+                            if(!firstCellRevealed) {
+                                self.populateBombs(currentCell);
+                                currentCell.reveal();
+                                firstCellRevealed = true;
+                            }
+
                             if(currentCell.isBomb) {
                                 self.gameOver = true;
                                 self.revealBombs();
@@ -150,7 +164,5 @@ public class Game extends JFrame{
                 add(currentCell);
             }
         }
-
-        populateBombs();
     }
 }
