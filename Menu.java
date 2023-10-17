@@ -10,6 +10,27 @@ public class Menu extends JFrame {
     public int windowSize;
     public int selectedGridSize;
     public int selectedBombAmount;
+
+    private JSlider gridSizeSlider;
+    private JSlider bombAmountSlider;
+    private JLabel gridSizeLabel;
+    private JLabel bombAmountLabel;
+
+    public void updateCustomDifficulty() {
+        this.gridSizeLabel.setText("Grid size: " + this.gridSizeSlider.getValue());
+        this.selectedGridSize = gridSizeSlider.getValue();
+
+        this.selectedBombAmount = (int)(this.selectedGridSize * this.selectedGridSize * (double)(this.bombAmountSlider.getValue() / 100.0));
+        this.bombAmountLabel.setText("Bombs / Cells: " + this.bombAmountSlider.getValue() + "% (" + this.selectedBombAmount + " total)");
+    }
+
+    public void setDifficulty(int gridSize, int bombAmount) {
+        this.selectedGridSize = gridSize;
+        this.selectedBombAmount = bombAmount;
+
+        this.gridSizeSlider.setValue(gridSize);
+        this.bombAmountSlider.setValue((100 * bombAmount) / (gridSize * gridSize));
+    }
     
     public void run() {
         setTitle("Menu");
@@ -26,9 +47,9 @@ public class Menu extends JFrame {
 
     public Menu(int windowSize) {
         this.windowSize = windowSize;
-        // default grid size & bomb amount
+        // default grid size & bomb amount (medium difficulty)
         this.selectedGridSize = 16;
-        this.selectedBombAmount = 80;
+        this.selectedBombAmount = 40;
 
         setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
@@ -50,11 +71,11 @@ public class Menu extends JFrame {
 
         JPanel difficultyPanel = new JPanel();
 
-        JSlider gridSizeSlider = new JSlider(JSlider.HORIZONTAL, 5, 35, this.selectedGridSize);
-        JSlider bombAmountSlider = new JSlider(JSlider.HORIZONTAL, 0, 99, this.selectedBombAmount);
+        this.gridSizeSlider = new JSlider(JSlider.HORIZONTAL, 5, 35, this.selectedGridSize);
+        this.bombAmountSlider = new JSlider(JSlider.HORIZONTAL, 0, 99, this.selectedBombAmount);
 
-        JLabel gridSizeLabel = new JLabel("Grid size: " + gridSizeSlider.getValue());
-        JLabel bombAmountLabel = new JLabel("Bomb / Cells: " + bombAmountSlider.getValue() + "% (" + this.selectedBombAmount + " total)");
+        this.gridSizeLabel = new JLabel("Grid size: " + gridSizeSlider.getValue());
+        this.bombAmountLabel = new JLabel("Bomb / Cells: " + bombAmountSlider.getValue() + "% (" + this.selectedBombAmount + " total)");
 
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -119,22 +140,22 @@ public class Menu extends JFrame {
         easyDifficultyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                self.selectedGridSize = 8;
-                self.selectedBombAmount = 20;
+                self.setDifficulty(10, 10);
+                self.updateCustomDifficulty();
             }
         });
         mediumDifficultyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                self.selectedGridSize = 16;
-                self.selectedBombAmount = 80;
+                self.setDifficulty(20, 80);
+                self.updateCustomDifficulty();
             }
         });
         hardDifficultyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                self.selectedGridSize = 32;
-                self.selectedBombAmount = 350;
+                self.setDifficulty(35, 245);
+                self.updateCustomDifficulty();
             }
         });
         customDifficultyButton.addActionListener(new ActionListener() {
@@ -150,20 +171,13 @@ public class Menu extends JFrame {
         gridSizeSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e){
-
-                gridSizeLabel.setText("Grid size: " + gridSizeSlider.getValue());
-                self.selectedGridSize = gridSizeSlider.getValue();
-
-                self.selectedBombAmount = (int)(self.selectedGridSize * selectedGridSize * (double)(bombAmountSlider.getValue() / 100.0));
-                bombAmountLabel.setText("Bombs / Cells: " + bombAmountSlider.getValue() + "% (" + self.selectedBombAmount + " total)");
+                self.updateCustomDifficulty();
             }
         });
         bombAmountSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e){
-
-                self.selectedBombAmount = (int)(self.selectedGridSize * selectedGridSize * (double)(bombAmountSlider.getValue() / 100.0));
-                bombAmountLabel.setText("Bombs / Cells: " + bombAmountSlider.getValue() + "% (" + self.selectedBombAmount + " total)");
+                self.updateCustomDifficulty();
             }
         });
     }
