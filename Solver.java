@@ -10,12 +10,12 @@ public class Solver {
             for(int x = 0; x < this.game.gridSize; x++) {
                 Cell cell = this.game.cells[y][x];
 
-                if(!cell.isRevealed) {
+                if(cell.neighboringBombs == 0 || !cell.isRevealed) {
                     continue;
                 }
 
-                int neighboringBombs = 0;
-                int neighboringPossible = 0;
+                int neighboringFoundBombs = 0;
+                ArrayList<Cell> neighboringPossible = new ArrayList<Cell>();
                 for(int ny = y - 1; ny <= y + 1; ny++) {
                     for(int nx = x - 1; nx <= x +1; nx++ ) {
 
@@ -29,18 +29,26 @@ public class Solver {
 
                         Cell neighboringCell = this.game.cells[ny][nx];
 
-                        if(!neighboringCell.isRevealed && !this.foundSafe.contains(neighboringCell)) {
-                            if(this.foundBombs.contains(neighboringCell)) {
-                                neighboringBombs++;
-                            }
+                        if(neighboringCell.isRevealed) {
+                            continue;
                         }
 
-                        neighboringPossible++;
+                        if(this.foundBombs.contains(neighboringCell)) {
+                            neighboringFoundBombs++;
+                        } else {
+                            neighboringPossible.add(neighboringCell);
+                        }
                     }
                 }
 
-                if (neighboringBombs == neighboringPossible) {
-                    this.foundSafe.add(cell);
+                //System.out.println("[SAFE] ("+cell.col+", "+cell.row+") - " + "cell.neighboringBombs: " + cell.neighboringBombs + ", neighboringFoundBombs: " + neighboringFoundBombs);
+
+                if (neighboringFoundBombs == cell.neighboringBombs) {
+                    for(Cell safe : neighboringPossible) {
+                        if(!this.foundSafe.contains(safe)) {
+                            this.foundSafe.add(safe);
+                        }
+                    }
                 }
             }
         }
@@ -50,6 +58,8 @@ public class Solver {
 
     // TODO also take into account remaining total bombs, eg total remaining cells = total remaining bombs?
     private int computeBombs() {
+        int newlyFoundBombCount = 0;
+
         for(int y = 0; y < this.game.gridSize; y++) {
             for(int x = 0; x < this.game.gridSize; x++) {
                 Cell cell = this.game.cells[y][x];
@@ -86,11 +96,12 @@ public class Solver {
                     }
                 }
 
-                //System.out.println("("+cell.col+", "+cell.row+") - " + "cell.neighboringBombs: " + cell.neighboringBombs + ", neighboringPossible.size(): " + neighboringPossible.size());
+                //System.out.println("[BOMB] ("+cell.col+", "+cell.row+") - " + "cell.neighboringBombs: " + cell.neighboringBombs + ", neighboringPossible.size(): " + neighboringPossible.size());
 
                 if(neighboringPossible.size() == cell.neighboringBombs) {
                     for(Cell bomb : neighboringPossible) {
                         if (!this.foundBombs.contains(bomb)) {
+                            newlyFoundBombCount++;
                             this.foundBombs.add(bomb);
                         }
                     }
@@ -98,24 +109,29 @@ public class Solver {
             }
         }
 
-        return this.foundBombs.size();
+        return newlyFoundBombCount;
     }
 
     // { { safe… }, { bomb… } }
     // when newly found safe bombs == 0: must guess situation
     public ArrayList<ArrayList<Cell>> solveSituation() {
 
+        int previousFoundBombs = 0;
+        int previousFoundSafe = 0;
         int currentFoundBombs = computeBombs();
         int currentFoundSafe = computeSafe();
 
-        int iteration = 0;
-        System.out.println("["+iteration+"] Bombs: " + currentFoundBombs + ", Safe: " + currentFoundSafe);
-        while (this.foundBombs.size() != currentFoundBombs || this.foundSafe.size() != currentFoundSafe) {
+        //int iteration = 0;
+        //System.out.println("["+iteration+"] Bombs: " + this.foundBombs.size() + ", Safe: " + this.foundSafe.size());
+        while (previousFoundBombs != currentFoundBombs || previousFoundSafe != currentFoundSafe) {
+            previousFoundBombs = currentFoundBombs;
+            previousFoundSafe = currentFoundSafe;
+
             currentFoundBombs = this.computeBombs();
             currentFoundSafe = this.computeSafe();
 
-            System.out.println("["+iteration+"] Bombs: " + currentFoundBombs + ", Safe: " + currentFoundSafe);
-            iteration++;
+            //System.out.println("["+iteration+"] Bombs: " + currentFoundBombs + ", Safe: " + currentFoundSafe);
+            //iteration++;
         }
 
         ArrayList<ArrayList<Cell>> solvedSituation = new ArrayList<ArrayList<Cell>>();

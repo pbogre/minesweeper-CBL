@@ -152,6 +152,9 @@ public class Game extends JFrame{
                                 self.revealBombs();
                                 return;
                             }
+                            if(currentCell.isRevealed) {
+                                return;
+                            }
 
                             if(!firstCellRevealed) {
                                 self.populateBombs(currentCell);
@@ -163,10 +166,14 @@ public class Game extends JFrame{
 
                             ArrayList<ArrayList<Cell>> solvedSituation = solver.solveSituation();
                             for(Cell safe : solvedSituation.get(0)) {
-                                safe.markSafe();
+                                if(!self.cells[safe.row][safe.col].isRevealed) {
+                                    safe.markSafe();
+                                }
                             }
                             for(Cell bomb : solvedSituation.get(1)) {
-                                bomb.markBomb();
+                                if(!self.cells[bomb.row][bomb.col].isRevealed) {
+                                    bomb.markBomb();
+                                }
                             }
 
                         }
