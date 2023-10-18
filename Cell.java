@@ -17,10 +17,6 @@ public class Cell extends JButton {
         setBackground(new ColorUIResource(255, 255, 0));
     }
 
-    void markSource() {
-        setBackground(new ColorUIResource(0, 0, 255));
-    }
-
     void markSafe() {
         setBackground(new ColorUIResource(0, 255, 0));
     }
@@ -31,7 +27,6 @@ public class Cell extends JButton {
 
     void makeBomb() {
         this.isBomb = true;
-        //setText("B");
     }
 
     void setNeighboringBombs(int neighboringBombs) {

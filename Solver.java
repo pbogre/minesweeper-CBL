@@ -100,8 +100,6 @@ public class Solver {
                     continue;
                 }
 
-                cell.markSource();
-
                 ArrayList<Cell> neighboringPossible = new ArrayList<Cell>();
                 for(int ny = y - 1; ny <= y + 1; ny++) {
                     for(int nx = x - 1; nx <= x +1; nx++ ) {
