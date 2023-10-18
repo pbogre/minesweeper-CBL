@@ -1,11 +1,35 @@
 import java.util.*;
 
+class GuessRequiredException extends Exception {
+    GuessRequiredException(int unknownCount, int unrevealedSafe) {
+        super("[GUESS] Total Unknown: " + unknownCount + ", Unrevealed Safe: " + unrevealedSafe );
+    }
+}
+
+// this exception and its handling should be done in Game.java
+class GameWonException extends Exception {
+    GameWonException() {
+        super("Game won");
+    }
+}
+
 public class Solver {
-    private ArrayList<Cell> foundBombs;
-    private ArrayList<Cell> foundSafe;
+    public int unrevealedSafe;
+    public ArrayList<Cell> foundBombs;
+    public ArrayList<Cell> foundSafe;
+    public ArrayList<Cell> foundUnknown;
     private Game game;
 
+    public void unreveal(Cell cell) {
+        if(this.foundSafe.contains(cell)) {
+            this.unrevealedSafe--;
+        }
+        this.foundUnknown.remove(cell);
+    }
+
     private int computeSafe() {
+        int newlyFoundSafe = 0;
+
         for(int y = 0; y < this.game.gridSize; y++) {
             for(int x = 0; x < this.game.gridSize; x++) {
                 Cell cell = this.game.cells[y][x];
@@ -35,7 +59,7 @@ public class Solver {
 
                         if(this.foundBombs.contains(neighboringCell)) {
                             neighboringFoundBombs++;
-                        } else {
+                        } else if (!this.foundSafe.contains(neighboringCell)){
                             neighboringPossible.add(neighboringCell);
                         }
                     }
@@ -45,15 +69,24 @@ public class Solver {
 
                 if (neighboringFoundBombs == cell.neighboringBombs) {
                     for(Cell safe : neighboringPossible) {
-                        if(!this.foundSafe.contains(safe)) {
-                            this.foundSafe.add(safe);
+                        newlyFoundSafe++;
+                        unrevealedSafe++;
+                        this.foundSafe.add(safe);
+
+                        this.foundUnknown.remove(safe);
+                    }
+                } else {
+                    for(Cell unknown : neighboringPossible) {
+                        if(!this.foundBombs.contains(unknown) && !this.foundUnknown.contains(unknown)) {
+                            this.foundUnknown.add(unknown);
+                            unknown.markUnknown();
                         }
                     }
                 }
             }
         }
 
-        return this.foundSafe.size();
+        return newlyFoundSafe;
     }
 
     // TODO also take into account remaining total bombs, eg total remaining cells = total remaining bombs?
@@ -88,8 +121,6 @@ public class Solver {
                             continue;
                         }
 
-                        neighboringCell.markUnknown();
-
                         if(!this.foundSafe.contains(neighboringCell)) {
                             neighboringPossible.add(neighboringCell);
                         }
@@ -103,6 +134,8 @@ public class Solver {
                         if (!this.foundBombs.contains(bomb)) {
                             newlyFoundBombCount++;
                             this.foundBombs.add(bomb);
+
+                            this.foundUnknown.remove(bomb);
                         }
                     }
                 }
@@ -114,7 +147,7 @@ public class Solver {
 
     // { { safe… }, { bomb… } }
     // when newly found safe bombs == 0: must guess situation
-    public ArrayList<ArrayList<Cell>> solveSituation() {
+    public ArrayList<ArrayList<Cell>> solveSituation() throws GuessRequiredException, GameWonException {
 
         int newlyFoundBombs = computeBombs();
         int newlyFoundSafe = computeSafe();
@@ -129,6 +162,15 @@ public class Solver {
             //iteration++;
         }
 
+        // if solved situation has no newly found safe cells 
+        // and there are no more safe cells to be revealed
+        if (newlyFoundSafe == 0 && newlyFoundBombs == 0 && this.unrevealedSafe <= 0) {
+            if (this.foundUnknown.size() == 0) {
+                throw new GameWonException();
+            }
+            throw new GuessRequiredException(this.foundUnknown.size(), this.unrevealedSafe);
+        }
+
         ArrayList<ArrayList<Cell>> solvedSituation = new ArrayList<ArrayList<Cell>>();
         solvedSituation.add(this.foundSafe);
         solvedSituation.add(this.foundBombs);
@@ -138,7 +180,10 @@ public class Solver {
 
     Solver(Game game) {
         this.game = game;
+        this.unrevealedSafe = 0;
+
         this.foundBombs = new ArrayList<Cell>();
         this.foundSafe = new ArrayList<Cell>();
+        this.foundUnknown = new ArrayList<>();
     }
 }

@@ -61,6 +61,8 @@ public class Game extends JFrame{
 
     public void computeNeighboringBombs(Cell cell) {
 
+        this.solver.unreveal(cell);
+
         if(cell.isBomb) {
             return;
         }
@@ -114,23 +116,33 @@ public class Game extends JFrame{
         }
     }
 
-    // TODO stop recursing when game is won / newlyFoundSafe = 0
+    // TODO java.util.ConcurrentModificationException on GuessRequiredException when running recursively
     void solveSituation() {
-        ArrayList<ArrayList<Cell>> solvedSituation = solver.solveSituation();
-        for(Cell safe : solvedSituation.get(0)) {
-            if(!this.cells[safe.row][safe.col].isRevealed) {
-                safe.markSafe();
+        try {
+            ArrayList<ArrayList<Cell>> solvedSituation = solver.solveSituation();
 
-                this.cells[safe.row][safe.col].reveal();
-                this.computeNeighboringBombs(this.cells[safe.row][safe.col]);
+            for(Cell safe : solvedSituation.get(0)) {
+                if(!this.cells[safe.row][safe.col].isRevealed) {
+                    safe.markSafe();
 
-                this.solveSituation();
+                    //this.cells[safe.row][safe.col].reveal();
+                    //this.computeNeighboringBombs(this.cells[safe.row][safe.col]);
+
+                    //this.solveSituation();
+                }
+            }
+
+            for(Cell bomb : solvedSituation.get(1)) {
+                if(!this.cells[bomb.row][bomb.col].isRevealed) {
+                    bomb.markBomb();
+                }
             }
         }
-        for(Cell bomb : solvedSituation.get(1)) {
-            if(!this.cells[bomb.row][bomb.col].isRevealed) {
-                bomb.markBomb();
-            }
+        catch (GuessRequiredException e) {
+            System.out.println(e.getMessage());
+        }
+        catch (GameWonException e) {
+            System.out.println(e.getMessage());
         }
     }
 
