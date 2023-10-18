@@ -6,7 +6,7 @@ class GuessRequiredException extends Exception {
     }
 }
 
-// this exception and its handling should be done in Game.java
+// TODO this exception and its handling should be done in Game.java
 class GameWonException extends Exception {
     GameWonException() {
         super("Game won");
@@ -89,7 +89,6 @@ public class Solver {
         return newlyFoundSafe;
     }
 
-    // TODO also take into account remaining total bombs, eg total remaining cells = total remaining bombs?
     private int computeBombs() {
         int newlyFoundBombCount = 0;
 
@@ -146,7 +145,6 @@ public class Solver {
     }
 
     // { { safe… }, { bomb… } }
-    // when newly found safe bombs == 0: must guess situation
     public ArrayList<ArrayList<Cell>> solveSituation() throws GuessRequiredException, GameWonException {
 
         int newlyFoundBombs = computeBombs();
