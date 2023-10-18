@@ -116,19 +116,14 @@ public class Solver {
     // when newly found safe bombs == 0: must guess situation
     public ArrayList<ArrayList<Cell>> solveSituation() {
 
-        int previousFoundBombs = 0;
-        int previousFoundSafe = 0;
-        int currentFoundBombs = computeBombs();
-        int currentFoundSafe = computeSafe();
+        int newlyFoundBombs = computeBombs();
+        int newlyFoundSafe = computeSafe();
 
         //int iteration = 0;
         //System.out.println("["+iteration+"] Bombs: " + this.foundBombs.size() + ", Safe: " + this.foundSafe.size());
-        while (previousFoundBombs != currentFoundBombs || previousFoundSafe != currentFoundSafe) {
-            previousFoundBombs = currentFoundBombs;
-            previousFoundSafe = currentFoundSafe;
-
-            currentFoundBombs = this.computeBombs();
-            currentFoundSafe = this.computeSafe();
+        while (newlyFoundBombs != 0 && newlyFoundSafe != 0) {
+            newlyFoundBombs = this.computeBombs();
+            newlyFoundSafe = this.computeSafe();
 
             //System.out.println("["+iteration+"] Bombs: " + currentFoundBombs + ", Safe: " + currentFoundSafe);
             //iteration++;
