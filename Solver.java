@@ -20,6 +20,18 @@ public class Solver {
         this.foundUnknown.remove(cell);
     }
 
+    // basically: if the amount of neighboringBombs of any cells 
+    // is equal to the number of cells that are 100% bombs neighboring it,
+    // then all other neighboring unrevealed cells must be safe
+    //
+    // not so basically: 
+    // for each revealed cell where neighboringBombs != 0
+    //   neighboringBombCount = 0
+    //   for each unrevealed neighboring cell
+    //     if this neighboring cell is 100% a bomb 
+    //      neighboringBombCount++
+    //   if neighboringBombCount == this cell's neighboringBombs
+    //     all unrevealed neighboring cells that aren't 100% bombs must be safe
     private int computeSafe() {
         int newlyFoundSafe = 0;
 
@@ -82,6 +94,19 @@ public class Solver {
         return newlyFoundSafe;
     }
 
+    // basically: if the amount of unrevealed neighboring cells of
+    // any cell where there exist some neighboring bombs is equal 
+    // to the amount of possible neighboring bombs (i.e. neighboring 
+    // unrevealed cells that haven't been marked as 100% safe),
+    // then all of those possible neighboring bombs must be bombs
+    //
+    // not so basically: 
+    // for each revealed cell where neighboringBombs != 0
+    //   possibleBombCount = 0
+    //   for each unrevealed cell neighboring this cell that is not 100% safe 
+    //     possibleBombCount++
+    //   if possibleBombCount == this cell's neighboringBombs 
+    //     all unrevealed neighboring cells that aren't 100% safe are bombs
     private int computeBombs() {
         int newlyFoundBombCount = 0;
 
@@ -135,7 +160,16 @@ public class Solver {
         return newlyFoundBombCount;
     }
 
-    // { { safe… }, { bomb… } }
+    // returns list of 2 lists;
+    // first list: 100% safe cells 
+    // second list: 100% bomb cells 
+    //
+    // we iterate the two solver steps until they produce no new results. 
+    // this is done because often more bombs can be found from the newly 
+    // found safe cells even if no new cells were revealed.
+    //
+    // bombs are computed before safe cells because at least 
+    // some 100% bombs are required to find 100% safe cells
     public ArrayList<ArrayList<Cell>> solveSituation() throws GuessRequiredException {
 
         int newlyFoundBombs = computeBombs();
@@ -154,9 +188,6 @@ public class Solver {
         // if solved situation has no newly found safe cells 
         // and there are no more safe cells to be revealed
         if (newlyFoundSafe == 0 && newlyFoundBombs == 0 && this.unrevealedSafe <= 0) {
-            //if (this.foundUnknown.size() == 0) {
-            //    throw new GameWonException();
-            //}
             throw new GuessRequiredException(this.foundUnknown.size(), this.unrevealedSafe);
         }
 
