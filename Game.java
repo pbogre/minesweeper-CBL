@@ -5,6 +5,12 @@ import java.awt.event.*;
 
 import java.util.*;
 
+class GameWonException extends Exception {
+    GameWonException() {
+        super("Game won");
+    }
+}
+
 public class Game extends JFrame{
     public boolean firstCellRevealed;
     public boolean gameOver;
@@ -12,6 +18,8 @@ public class Game extends JFrame{
     public int cellSize;
     public int bombAmount;
     public Cell[][] cells;
+
+    public int revealedCount;
 
     public Solver solver;
 
@@ -59,9 +67,16 @@ public class Game extends JFrame{
         }
     }
 
-    public void computeNeighboringBombs(Cell cell) {
+    public void computeNeighboringBombs(Cell cell) throws GameWonException {
 
-        this.solver.unreveal(cell);
+        cell.reveal();
+        this.revealedCount++;
+
+        if (this.gridSize * this.gridSize - this.revealedCount == this.bombAmount) {
+            throw new GameWonException();
+        }
+
+        this.solver.reveal(cell);
 
         if(cell.isBomb) {
             return;
@@ -110,13 +125,11 @@ public class Game extends JFrame{
                     continue;
                 }
 
-                currentCell.reveal();
                 computeNeighboringBombs(currentCell);
             }
         }
     }
 
-    // TODO java.util.ConcurrentModificationException on GuessRequiredException when running recursively
     void solveSituation() {
         try {
             ArrayList<ArrayList<Cell>> solvedSituation = solver.solveSituation();
@@ -125,24 +138,29 @@ public class Game extends JFrame{
                 if(!this.cells[safe.row][safe.col].isRevealed) {
                     safe.markSafe();
 
-                    //this.cells[safe.row][safe.col].reveal();
-                    //this.computeNeighboringBombs(this.cells[safe.row][safe.col]);
+                    //try {
+                    //    this.computeNeighboringBombs(this.cells[safe.row][safe.col]);
+                    //}
+                    //catch (GameWonException e) {
+                    //    System.out.println(e.getMessage());
+                    //    this.gameOver = true;
+                    //}
 
                     //this.solveSituation();
                 }
             }
 
             for(Cell bomb : solvedSituation.get(1)) {
-                if(!this.cells[bomb.row][bomb.col].isRevealed) {
-                    bomb.markBomb();
-                }
+                bomb.markBomb();
             }
         }
         catch (GuessRequiredException e) {
             System.out.println(e.getMessage());
+            return;
         }
-        catch (GameWonException e) {
-            System.out.println(e.getMessage());
+        // TODO handle the exception that happens on guess required sometimes
+        catch (Exception e) {
+            System.out.println("AN EXCEPTION OCCURED");
         }
     }
 
@@ -153,6 +171,8 @@ public class Game extends JFrame{
         this.gridSize = gridSize;
         this.bombAmount = bombAmount;
         this.cells = new Cell[this.gridSize][this.gridSize];
+       
+        this.revealedCount = 0;
 
         this.solver = new Solver(this);
 
@@ -181,6 +201,7 @@ public class Game extends JFrame{
                             }
                             if(currentCell.isBomb) {
                                 self.gameOver = true;
+                                System.out.println("Game lost");
                                 self.revealBombs();
                                 return;
                             }
@@ -193,8 +214,15 @@ public class Game extends JFrame{
                                 firstCellRevealed = true;
                             }
 
-                            currentCell.reveal();
-                            self.computeNeighboringBombs(currentCell);
+                            try {
+                                self.computeNeighboringBombs(currentCell);
+                            }
+                            catch (GameWonException e) {
+                                System.out.println(e.getMessage());
+                                self.gameOver = true;
+                                return;
+                            }
+
                             self.solveSituation();
                         }
                     }

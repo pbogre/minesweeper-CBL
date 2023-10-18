@@ -6,13 +6,6 @@ class GuessRequiredException extends Exception {
     }
 }
 
-// TODO this exception and its handling should be done in Game.java
-class GameWonException extends Exception {
-    GameWonException() {
-        super("Game won");
-    }
-}
-
 public class Solver {
     public int unrevealedSafe;
     public ArrayList<Cell> foundBombs;
@@ -20,7 +13,7 @@ public class Solver {
     public ArrayList<Cell> foundUnknown;
     private Game game;
 
-    public void unreveal(Cell cell) {
+    public void reveal(Cell cell) {
         if(this.foundSafe.contains(cell)) {
             this.unrevealedSafe--;
         }
@@ -143,7 +136,7 @@ public class Solver {
     }
 
     // { { safe… }, { bomb… } }
-    public ArrayList<ArrayList<Cell>> solveSituation() throws GuessRequiredException, GameWonException {
+    public ArrayList<ArrayList<Cell>> solveSituation() throws GuessRequiredException {
 
         int newlyFoundBombs = computeBombs();
         int newlyFoundSafe = computeSafe();
@@ -161,9 +154,9 @@ public class Solver {
         // if solved situation has no newly found safe cells 
         // and there are no more safe cells to be revealed
         if (newlyFoundSafe == 0 && newlyFoundBombs == 0 && this.unrevealedSafe <= 0) {
-            if (this.foundUnknown.size() == 0) {
-                throw new GameWonException();
-            }
+            //if (this.foundUnknown.size() == 0) {
+            //    throw new GameWonException();
+            //}
             throw new GuessRequiredException(this.foundUnknown.size(), this.unrevealedSafe);
         }
 
