@@ -140,7 +140,7 @@ public class Game extends JFrame{
         JLabel timeLabel = new JLabel("Time: " + this.time);
         timeLabel.setFont(new Font("Arial", Font.BOLD, 18));
 
-        JLabel mainLabel = new JLabel("Test");
+        JLabel mainLabel = new JLabel("Minesweeper");
         mainLabel.setFont(new Font("Arial", Font.BOLD, 25));
 
         JLabel remainingLabel = new JLabel("Remaining: " + this.remainingBombsCount);
@@ -187,7 +187,9 @@ public class Game extends JFrame{
 
                         if (SwingUtilities.isRightMouseButton(me)) {
                             currentCell.toggleFlag();
-                            self.remainingBombsCount += currentCell.isFlagged ? -1 : 1;
+                            if(!currentCell.isRevealed){
+                                self.remainingBombsCount += currentCell.isFlagged ? -1 : 1;
+                            }
                             remainingLabel.setText("Remaining: " + self.remainingBombsCount);
                         }
                         if (SwingUtilities.isLeftMouseButton(me)) {
