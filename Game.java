@@ -118,10 +118,22 @@ public class Game extends JFrame{
         this.gridSize = gridSize;
         this.bombAmount = bombAmount;
         this.cells = new Cell[this.gridSize][this.gridSize];
+        setSize(gridSize * cellSize, gridSize * cellSize);
         JPanel mineFieldPanel = new JPanel();
         JPanel gameStatsPanel = new JPanel();
 
-        setLayout(new GridBagLayout());
+        // Create labels for game stats panel
+        JLabel label1 = new JLabel("Hi");
+        label1.setFont(new Font("Arial", Font.BOLD, 50));
+        JLabel label2 = new JLabel("Test");
+
+        gameStatsPanel.setLayout(new FlowLayout());
+        gameStatsPanel.add(label1);
+        gameStatsPanel.add(label2);
+
+        mineFieldPanel.setLayout(new GridLayout(gridSize, gridSize));
+
+        /*setLayout(new GridBagLayout());
         setSize(this.gridSize * this.cellSize, (this.gridSize * this.cellSize) + 150);
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.insets = new Insets(10, 10, 10, 10);
@@ -129,15 +141,7 @@ public class Game extends JFrame{
         mineFieldPanel.setSize(this.gridSize * this.cellSize, this.gridSize * this.cellSize);
         mineFieldPanel.setLayout(new GridLayout(this.gridSize, this.gridSize));
 
-        gameStatsPanel.setSize(this.gridSize * this.cellSize, 150);
-
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        add(gameStatsPanel, constraints);
-
-        constraints.gridx = 0;
-        constraints.gridy = 1;
-        add(mineFieldPanel, constraints);
+        gameStatsPanel.setSize(this.gridSize * this.cellSize, 150);*/
 
         for (int y = 0; y < this.gridSize; y++) {
             for (int x = 0; x < this.gridSize; x++) {
@@ -182,5 +186,8 @@ public class Game extends JFrame{
                 mineFieldPanel.add(currentCell);
             }
         }
+        add(gameStatsPanel, BorderLayout.NORTH);
+        add(mineFieldPanel);
+        setVisible(true);
     }
 }

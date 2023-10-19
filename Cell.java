@@ -22,35 +22,35 @@ public class Cell extends JButton {
         if(this.neighboringBombs != 0) {
             switch(neighboringBombs){
                 case 1:
-                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_1.png"));
+                    icon = new ImageIcon(getClass().getResource("/res/1.png"));
                     setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
                     break;
                 case 2:
-                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_2.png"));
+                    icon = new ImageIcon(getClass().getResource("/res/2.png"));
                     setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
                     break;
                 case 3:
-                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_3.png"));
+                    icon = new ImageIcon(getClass().getResource("/res/3.png"));
                     setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
                     break;
                 case 4:
-                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_4.png"));
+                    icon = new ImageIcon(getClass().getResource("/res/4.png"));
                     setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
                     break;
                 case 5:
-                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_5.png"));
+                    icon = new ImageIcon(getClass().getResource("/res/5.png"));
                     setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
                     break;
                 case 6:
-                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_6.png"));
+                    icon = new ImageIcon(getClass().getResource("/res/6.png"));
                     setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
                     break;
                 case 7:
-                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_7.png"));
+                    icon = new ImageIcon(getClass().getResource("/res/7.png"));
                     setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
                     break;
                 case 8:
-                    icon = new ImageIcon(getClass().getResource("/res/Minesweeper_8.png"));
+                    icon = new ImageIcon(getClass().getResource("/res/8.png"));
                     setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
                     break;
                 default:
@@ -60,18 +60,16 @@ public class Cell extends JButton {
     }
 
     void reveal() {
-        this.isRevealed = true;
+        this.isRevealed = true; 
 
-        if(this.isBomb && !this.isFlagged) {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/res/Minesweeper_Bomb.png"));
+        if(this.isBomb) {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/res/bomb.png"));
             setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
             return;
         }
 
-        if(!this.isFlagged){
-            setBackground(Color.GRAY);
-            setBorder(BorderFactory.createLoweredBevelBorder());
-        }
+        setBackground(Color.GRAY);
+        setBorder(BorderFactory.createLoweredBevelBorder());
     }
 
     void toggleFlag() {
@@ -82,7 +80,7 @@ public class Cell extends JButton {
         if (!this.isFlagged) {
             this.isFlagged = true;
 
-            ImageIcon icon = new ImageIcon(getClass().getResource("/res/Minesweeper_flag.png"));
+            ImageIcon icon = new ImageIcon(getClass().getResource("/res/flag.png"));
             setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
         }
         else if(this.isFlagged){
