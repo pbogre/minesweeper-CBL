@@ -3,6 +3,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 import java.awt.event.*;
+import javax.swing.Timer;
 
 public class Game extends JFrame{
     public boolean firstCellRevealed;
@@ -11,6 +12,7 @@ public class Game extends JFrame{
     public int cellSize;
     public int bombAmount;
     public Cell[][] cells;
+    public long startTime;
 
     public void stop() {
         setVisible(false);
@@ -121,10 +123,11 @@ public class Game extends JFrame{
         setSize(gridSize * cellSize, gridSize * cellSize);
         JPanel mineFieldPanel = new JPanel();
         JPanel gameStatsPanel = new JPanel();
+        Timer timer;
 
         // Create labels for game stats panel
-        JLabel label1 = new JLabel("Hi");
-        label1.setFont(new Font("Arial", Font.BOLD, 50));
+        JLabel label1 = new JLabel("0");
+        label1.setFont(new Font("Arial", Font.BOLD, 25));
         JLabel label2 = new JLabel("Test");
 
         gameStatsPanel.setLayout(new FlowLayout());
@@ -189,5 +192,15 @@ public class Game extends JFrame{
         add(gameStatsPanel, BorderLayout.NORTH);
         add(mineFieldPanel);
         setVisible(true);
+
+        startTime = System.currentTimeMillis();
+        timer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                long elapsedSeconds = (System.currentTimeMillis() - startTime) / 1000;
+                label1.setText(String.valueOf(elapsedSeconds));
+            }
+        });
+        timer.start();
     }
 }
