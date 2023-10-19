@@ -138,13 +138,13 @@ public class Game extends JFrame{
 
         // Create components for game stats panel
         JLabel timeLabel = new JLabel("Time: " + this.time);
-        timeLabel.setFont(new Font("Arial", Font.BOLD, 25));
+        timeLabel.setFont(new Font("Arial", Font.BOLD, 18));
 
         JLabel mainLabel = new JLabel("Test");
         mainLabel.setFont(new Font("Arial", Font.BOLD, 25));
 
         JLabel remainingLabel = new JLabel("Remaining: " + this.remainingBombsCount);
-        remainingLabel.setFont(new Font("Arial", Font.BOLD, 25));
+        remainingLabel.setFont(new Font("Arial", Font.BOLD, 18));
 
         JButton menuButton = new JButton("Menu");
         menuButton.addActionListener(new ActionListener() {
