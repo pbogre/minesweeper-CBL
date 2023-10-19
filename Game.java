@@ -20,6 +20,9 @@ public class Game extends JFrame{
     public void stop() {
         setVisible(false);
         dispose();
+
+        Menu menu = new Menu(500);
+        menu.run();
     }
 
     public void run() {
@@ -126,12 +129,14 @@ public class Game extends JFrame{
 
         this.remainingBombsCount = this.bombAmount;
 
+        Game self = this; // utility
+
         setSize(gridSize * cellSize, gridSize * cellSize);
 
         JPanel mineFieldPanel = new JPanel();
         JPanel gameStatsPanel = new JPanel();
 
-        // Create labels for game stats panel
+        // Create components for game stats panel
         JLabel timeLabel = new JLabel("Time: " + this.time);
         timeLabel.setFont(new Font("Arial", Font.BOLD, 25));
 
@@ -141,11 +146,20 @@ public class Game extends JFrame{
         JLabel remainingLabel = new JLabel("Remaining: " + this.remainingBombsCount);
         remainingLabel.setFont(new Font("Arial", Font.BOLD, 25));
 
+        JButton menuButton = new JButton("Menu");
+        menuButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                self.stop();
+            }
+        }); 
+
         // TODO left/right/center alignment
         gameStatsPanel.setLayout(new FlowLayout());
         gameStatsPanel.add(timeLabel);
         gameStatsPanel.add(mainLabel);
         gameStatsPanel.add(remainingLabel);
+        gameStatsPanel.add(menuButton);
 
         mineFieldPanel.setLayout(new GridLayout(gridSize, gridSize));
 
@@ -165,7 +179,6 @@ public class Game extends JFrame{
                 Cell currentCell = this.cells[y][x];
                 currentCell.setFocusPainted(false);
 
-                Game self = this;
                 currentCell.addMouseListener(new MouseListener() {
                     public void mouseClicked(MouseEvent me) {
                         if(self.gameOver) {
