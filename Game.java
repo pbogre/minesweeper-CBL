@@ -138,6 +138,8 @@ public class Game extends JFrame{
                 if(!this.cells[safe.row][safe.col].isRevealed) {
                     safe.markSafe();
 
+                    // uncomment stuff below for recursive solver 
+                    // i.e., automatically win games if possible
                     //try {
                     //    this.computeNeighboringBombs(this.cells[safe.row][safe.col]);
                     //}

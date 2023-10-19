@@ -164,9 +164,9 @@ public class Solver {
     // first list: 100% safe cells 
     // second list: 100% bomb cells 
     //
-    // we iterate the two solver steps until they produce no new results. 
+    // we iterate the two solver steps until they produce no new results
     // this is done because often more bombs can be found from the newly 
-    // found safe cells even if no new cells were revealed.
+    // found safe cells even if no new cells were revealed and vice versa
     //
     // bombs are computed before safe cells because at least 
     // some 100% bombs are required to find 100% safe cells
