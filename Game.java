@@ -15,6 +15,7 @@ public class Game extends JFrame{
 
     public Timer timer;
     public long time;
+    public int remainingBombsCount;
 
     public void stop() {
         setVisible(false);
@@ -123,21 +124,28 @@ public class Game extends JFrame{
         this.bombAmount = bombAmount;
         this.cells = new Cell[this.gridSize][this.gridSize];
 
+        this.remainingBombsCount = this.bombAmount;
+
         setSize(gridSize * cellSize, gridSize * cellSize);
 
         JPanel mineFieldPanel = new JPanel();
         JPanel gameStatsPanel = new JPanel();
-        Timer timer;
 
         // Create labels for game stats panel
-        JLabel label1 = new JLabel("0");
-        label1.setFont(new Font("Arial", Font.BOLD, 25));
-        JLabel label2 = new JLabel("Test");
-        label2.setFont(new Font("Arial", Font.BOLD, 25));
+        JLabel timeLabel = new JLabel("Time: " + this.time);
+        timeLabel.setFont(new Font("Arial", Font.BOLD, 25));
 
+        JLabel mainLabel = new JLabel("Test");
+        mainLabel.setFont(new Font("Arial", Font.BOLD, 25));
+
+        JLabel remainingLabel = new JLabel("Remaining: " + this.remainingBombsCount);
+        remainingLabel.setFont(new Font("Arial", Font.BOLD, 25));
+
+        // TODO left/right/center alignment
         gameStatsPanel.setLayout(new FlowLayout());
-        gameStatsPanel.add(label1);
-        gameStatsPanel.add(label2);
+        gameStatsPanel.add(timeLabel);
+        gameStatsPanel.add(mainLabel);
+        gameStatsPanel.add(remainingLabel);
 
         mineFieldPanel.setLayout(new GridLayout(gridSize, gridSize));
 
@@ -166,6 +174,8 @@ public class Game extends JFrame{
 
                         if (SwingUtilities.isRightMouseButton(me)) {
                             currentCell.toggleFlag();
+                            self.remainingBombsCount += currentCell.isFlagged ? -1 : 1;
+                            remainingLabel.setText("Remaining: " + self.remainingBombsCount);
                         }
                         if (SwingUtilities.isLeftMouseButton(me)) {
                             if(currentCell.isFlagged) {
@@ -205,7 +215,7 @@ public class Game extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 time++;
-                label1.setText(String.valueOf(time));
+                timeLabel.setText("Time: " + String.valueOf(time));
             }
         });
         this.timer.start();
