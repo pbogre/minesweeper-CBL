@@ -12,7 +12,9 @@ public class Game extends JFrame{
     public int cellSize;
     public int bombAmount;
     public Cell[][] cells;
-    public long startTime;
+
+    public Timer timer;
+    public long time;
 
     public void stop() {
         setVisible(false);
@@ -120,7 +122,9 @@ public class Game extends JFrame{
         this.gridSize = gridSize;
         this.bombAmount = bombAmount;
         this.cells = new Cell[this.gridSize][this.gridSize];
+
         setSize(gridSize * cellSize, gridSize * cellSize);
+
         JPanel mineFieldPanel = new JPanel();
         JPanel gameStatsPanel = new JPanel();
         Timer timer;
@@ -169,6 +173,7 @@ public class Game extends JFrame{
                             }
                             if(currentCell.isBomb) {
                                 self.gameOver = true;
+                                self.timer.stop();
                                 self.revealBombs();
                                 return;
                             }
@@ -195,16 +200,14 @@ public class Game extends JFrame{
         add(mineFieldPanel);
         setVisible(true);
 
-        startTime = System.currentTimeMillis();
-        timer = new Timer(1000, new ActionListener() {
+        time = 0;
+        this.timer = new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                long elapsedSeconds = (System.currentTimeMillis() - startTime) / 1000;
-                label1.setText(String.valueOf(elapsedSeconds));
+                time++;
+                label1.setText(String.valueOf(time));
             }
         });
-        timer.start();
-
-        
+        this.timer.start();
     }
 }
