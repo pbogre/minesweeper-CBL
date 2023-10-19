@@ -60,7 +60,7 @@ public class Cell extends JButton {
     }
 
     void reveal() {
-        this.isRevealed = true; 
+        this.isRevealed = true;
 
         if(this.isBomb) {
             ImageIcon icon = new ImageIcon(getClass().getResource("/res/bomb.png"));

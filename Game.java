@@ -129,6 +129,7 @@ public class Game extends JFrame{
         JLabel label1 = new JLabel("0");
         label1.setFont(new Font("Arial", Font.BOLD, 25));
         JLabel label2 = new JLabel("Test");
+        label2.setFont(new Font("Arial", Font.BOLD, 25));
 
         gameStatsPanel.setLayout(new FlowLayout());
         gameStatsPanel.add(label1);
@@ -202,5 +203,7 @@ public class Game extends JFrame{
             }
         });
         timer.start();
+
+        
     }
 }
