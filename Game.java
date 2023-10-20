@@ -154,7 +154,7 @@ public class Game extends JFrame{
             }
         }); 
 
-        // TODO left/right/center alignment
+        // TODO: left/right/center alignment
         gameStatsPanel.setLayout(new FlowLayout());
         gameStatsPanel.add(timeLabel);
         gameStatsPanel.add(mainLabel);
@@ -187,8 +187,12 @@ public class Game extends JFrame{
 
                         if (SwingUtilities.isRightMouseButton(me)) {
                             currentCell.toggleFlag();
-                            if(!currentCell.isRevealed){
+                            if(!currentCell.isRevealed && self.remainingBombsCount != 0){
                                 self.remainingBombsCount += currentCell.isFlagged ? -1 : 1;
+                            }
+                            else if(self.remainingBombsCount == 0){
+                                currentCell.setIcon(null);
+                                self.remainingBombsCount++;
                             }
                             remainingLabel.setText("Remaining: " + self.remainingBombsCount);
                         }
