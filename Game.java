@@ -4,6 +4,7 @@ import java.awt.*;
 import java.util.*;
 import java.awt.event.*;
 import javax.swing.Timer;
+import javax.swing.border.Border;
 
 public class Game extends JFrame{
     public boolean firstCellRevealed;
@@ -138,14 +139,18 @@ public class Game extends JFrame{
         JPanel gameStatsPanel = new JPanel();
 
         // Create components for game stats panel
-        JLabel timeLabel = new JLabel("Time: " + this.time);
+        JPanel leftAlignPanel = new JPanel(new GridLayout());
+        JPanel centerAlignPanel = new JPanel(new FlowLayout());
+        JPanel rightAlignPanel = new JPanel(new FlowLayout());
+
+        JLabel timeLabel = new JLabel(this.time + "s");
         timeLabel.setFont(new Font("Arial", Font.BOLD, 18));
 
-        JLabel mainLabel = new JLabel("Minesweeper");
-        mainLabel.setFont(new Font("Arial", Font.BOLD, 25));
-
-        JLabel remainingLabel = new JLabel("Remaining: " + this.remainingBombsCount);
+        JLabel remainingLabel = new JLabel(this.remainingBombsCount + " left");
         remainingLabel.setFont(new Font("Arial", Font.BOLD, 18));
+
+        JLabel mainLabel = new JLabel(":)");
+        mainLabel.setFont(new Font("Arial", Font.BOLD, 25));
 
         JButton menuButton = new JButton("Menu");
         menuButton.addActionListener(new ActionListener() {
@@ -155,24 +160,28 @@ public class Game extends JFrame{
             }
         }); 
 
-        // TODO: left/right/center alignment
-        gameStatsPanel.setLayout(new FlowLayout());
-        gameStatsPanel.add(timeLabel);
-        gameStatsPanel.add(mainLabel);
-        gameStatsPanel.add(remainingLabel);
-        gameStatsPanel.add(menuButton);
+        JButton hintButton = new JButton("Hint");
+        hintButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // start hint mode
+            }
+        }); 
+
+        leftAlignPanel.add(timeLabel);
+        leftAlignPanel.add(remainingLabel);
+
+        centerAlignPanel.add(mainLabel);
+
+        rightAlignPanel.add(menuButton);
+        rightAlignPanel.add(hintButton);
+
+        gameStatsPanel.setLayout(new GridLayout());
+        gameStatsPanel.add(leftAlignPanel);
+        gameStatsPanel.add(centerAlignPanel);
+        gameStatsPanel.add(rightAlignPanel);
 
         mineFieldPanel.setLayout(new GridLayout(gridSize, gridSize));
-
-        /*setLayout(new GridBagLayout());
-        setSize(this.gridSize * this.cellSize, (this.gridSize * this.cellSize) + 150);
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.insets = new Insets(10, 10, 10, 10);
-
-        mineFieldPanel.setSize(this.gridSize * this.cellSize, this.gridSize * this.cellSize);
-        mineFieldPanel.setLayout(new GridLayout(this.gridSize, this.gridSize));
-
-        gameStatsPanel.setSize(this.gridSize * this.cellSize, 150);*/
 
         for (int y = 0; y < this.gridSize; y++) {
             for (int x = 0; x < this.gridSize; x++) {
@@ -235,7 +244,7 @@ public class Game extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 time++;
-                timeLabel.setText("Time: " + String.valueOf(time));
+                timeLabel.setText(String.valueOf(time) + "s");
             }
         });
         this.timer.start();
