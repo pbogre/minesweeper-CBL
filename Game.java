@@ -4,7 +4,6 @@ import java.awt.*;
 import java.util.*;
 import java.awt.event.*;
 import javax.swing.Timer;
-import javax.swing.border.Border;
 
 public class Game extends JFrame{
     public boolean firstCellRevealed;
@@ -204,7 +203,7 @@ public class Game extends JFrame{
                                 currentCell.setIcon(null);
                                 self.remainingBombsCount++;
                             }
-                            remainingLabel.setText("Remaining: " + self.remainingBombsCount);
+                            remainingLabel.setText(self.remainingBombsCount + " left");
                         }
                         if (SwingUtilities.isLeftMouseButton(me)) {
                             if(currentCell.isFlagged) {
