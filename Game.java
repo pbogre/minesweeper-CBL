@@ -131,6 +131,7 @@ public class Game extends JFrame{
 
         Game self = this; // utility
 
+        setMinimumSize(new Dimension(500, 500));
         setSize(gridSize * cellSize, gridSize * cellSize);
 
         JPanel mineFieldPanel = new JPanel();
