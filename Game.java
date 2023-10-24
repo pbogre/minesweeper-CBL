@@ -237,6 +237,7 @@ public class Game extends JFrame{
 
                             if(!firstCellRevealed) {
                                 self.populateBombs(currentCell);
+                                self.timer.start();
                                 firstCellRevealed = true;
                             }
 
@@ -265,6 +266,5 @@ public class Game extends JFrame{
                 timeLabel.setText(String.valueOf(time) + "s");
             }
         });
-        this.timer.start();
     }
 }
