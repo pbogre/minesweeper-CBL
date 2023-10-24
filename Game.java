@@ -149,6 +149,8 @@ public class Game extends JFrame{
 
         // Create components for game stats panel
         JPanel leftAlignPanel = new JPanel(new GridLayout());
+        leftAlignPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
+        
         JPanel centerAlignPanel = new JPanel(new FlowLayout());
         JPanel rightAlignPanel = new JPanel(new FlowLayout());
 
