@@ -8,6 +8,7 @@ import javax.swing.Timer;
 public class Game extends JFrame{
     public boolean firstCellRevealed;
     public boolean gameOver;
+    public boolean hintMode;
     public int gridSize;
     public int cellSize;
     public int bombAmount;
@@ -29,6 +30,14 @@ public class Game extends JFrame{
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
+    }
+
+    public void toggleHintMode() {
+        this.hintMode = !this.hintMode;
+
+        if(!this.hintMode) {
+            // reset background color of all cells 
+        }
     }
 
     public void revealBombs() {
@@ -122,6 +131,7 @@ public class Game extends JFrame{
     public Game(int gridSize, int bombAmount){
         this.firstCellRevealed = false;
         this.gameOver = false;
+        this.hintMode = false;
         this.cellSize = 35;
         this.gridSize = gridSize;
         this.bombAmount = bombAmount;
@@ -163,7 +173,8 @@ public class Game extends JFrame{
         hintButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // start hint mode
+                // toggle hint mode
+                self.toggleHintMode();
             }
         }); 
 
