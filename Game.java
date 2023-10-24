@@ -2,6 +2,7 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.Timer;
 
 import java.util.*;
 
@@ -14,24 +15,39 @@ class GameWonException extends Exception {
 public class Game extends JFrame{
     public boolean firstCellRevealed;
     public boolean gameOver;
+    public boolean hintMode;
     public int gridSize;
     public int cellSize;
     public int bombAmount;
     public Cell[][] cells;
 
     public int revealedCount;
-
     public Solver solver;
+
+    public Timer timer;
+    public long time;
+    public int remainingBombsCount;
 
     public void stop() {
         setVisible(false);
         dispose();
+
+        Menu menu = new Menu(500);
+        menu.run();
     }
 
     public void run() {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
+    }
+
+    public void toggleHintMode() {
+        this.hintMode = !this.hintMode;
+
+        if(!this.hintMode) {
+            // reset background color of all cells 
+        }
     }
 
     public void revealBombs() {
@@ -169,6 +185,7 @@ public class Game extends JFrame{
     public Game(int gridSize, int bombAmount){
         this.firstCellRevealed = false;
         this.gameOver = false;
+        this.hintMode = false;
         this.cellSize = 35;
         this.gridSize = gridSize;
         this.bombAmount = bombAmount;
@@ -178,8 +195,63 @@ public class Game extends JFrame{
 
         this.solver = new Solver(this);
 
-        setSize(this.gridSize * this.cellSize, this.gridSize * this.cellSize);
-        setLayout(new GridLayout(this.gridSize, this.gridSize));
+        this.remainingBombsCount = this.bombAmount;
+
+        Game self = this; // utility
+
+        setMinimumSize(new Dimension(500, 500));
+        setSize(gridSize * cellSize, gridSize * cellSize);
+
+        JPanel mineFieldPanel = new JPanel();
+        JPanel gameStatsPanel = new JPanel();
+
+        // Create components for game stats panel
+        JPanel leftAlignPanel = new JPanel(new GridLayout());
+        leftAlignPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
+        
+        JPanel centerAlignPanel = new JPanel(new FlowLayout());
+        JPanel rightAlignPanel = new JPanel(new FlowLayout());
+
+        JLabel timeLabel = new JLabel(this.time + "s");
+        timeLabel.setFont(new Font("Arial", Font.BOLD, 18));
+
+        JLabel remainingLabel = new JLabel(this.remainingBombsCount + " left");
+        remainingLabel.setFont(new Font("Arial", Font.BOLD, 18));
+
+        JLabel mainLabel = new JLabel(":)");
+        mainLabel.setFont(new Font("Arial", Font.BOLD, 25));
+
+        JButton menuButton = new JButton("Menu");
+        menuButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                self.stop();
+            }
+        }); 
+
+        JButton hintButton = new JButton("Hint");
+        hintButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // toggle hint mode
+                self.toggleHintMode();
+            }
+        }); 
+
+        leftAlignPanel.add(timeLabel);
+        leftAlignPanel.add(remainingLabel);
+
+        centerAlignPanel.add(mainLabel);
+
+        rightAlignPanel.add(menuButton);
+        rightAlignPanel.add(hintButton);
+
+        gameStatsPanel.setLayout(new GridLayout());
+        gameStatsPanel.add(leftAlignPanel);
+        gameStatsPanel.add(centerAlignPanel);
+        gameStatsPanel.add(rightAlignPanel);
+
+        mineFieldPanel.setLayout(new GridLayout(gridSize, gridSize));
 
         for (int y = 0; y < this.gridSize; y++) {
             for (int x = 0; x < this.gridSize; x++) {
@@ -187,7 +259,6 @@ public class Game extends JFrame{
                 Cell currentCell = this.cells[y][x];
                 currentCell.setFocusPainted(false);
 
-                Game self = this;
                 currentCell.addMouseListener(new MouseListener() {
                     public void mouseClicked(MouseEvent me) {
                         if(self.gameOver) {
@@ -196,18 +267,23 @@ public class Game extends JFrame{
 
                         if (SwingUtilities.isRightMouseButton(me)) {
                             currentCell.toggleFlag();
+
+                            self.remainingBombsCount += currentCell.isFlagged ? -1 : 1;
+                            remainingLabel.setText(self.remainingBombsCount + " left");
                         }
                         if (SwingUtilities.isLeftMouseButton(me)) {
                             if(currentCell.isFlagged) {
                                 return;
                             }
-                            if(currentCell.isBomb) {
+                            else if(currentCell.isBomb) {
                                 self.gameOver = true;
-                                System.out.println("Game lost");
+                                self.timer.stop();
                                 self.revealBombs();
+
+                                System.out.println("Game lost");
                                 return;
                             }
-                            if(currentCell.isRevealed) {
+                            else if(currentCell.isRevealed) {
                                 return;
                             }
 
@@ -220,8 +296,10 @@ public class Game extends JFrame{
                                 self.computeNeighboringBombs(currentCell);
                             }
                             catch (GameWonException e) {
-                                System.out.println(e.getMessage());
                                 self.gameOver = true;
+                                self.timer.stop();
+
+                                System.out.println(e.getMessage());
                                 return;
                             }
 
@@ -234,8 +312,21 @@ public class Game extends JFrame{
                     public void mouseExited(MouseEvent me) {}
                 });
 
-                add(currentCell);
+                mineFieldPanel.add(currentCell);
             }
         }
+        add(gameStatsPanel, BorderLayout.NORTH);
+        add(mineFieldPanel);
+        setVisible(true);
+
+        time = 0;
+        this.timer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                time++;
+                timeLabel.setText(String.valueOf(time) + "s");
+            }
+        });
+        this.timer.start();
     }
 }
