@@ -45,9 +45,28 @@ public class Game extends JFrame{
     public void toggleHintMode() {
         this.hintMode = !this.hintMode;
 
-        if(!this.hintMode) {
-            // reset background color of all cells 
+        if (!this.firstCellRevealed) {
+            return;
         }
+
+        // if disabling hint mode, reset color of all cells unrevealed
+        if(!this.hintMode) {
+            for(int y = 0; y < this.gridSize; y++) {
+                for(int x = 0; x < this.gridSize; x++) {
+
+                    if (this.cells[y][x].isRevealed) {
+                        continue;
+                    }
+
+                    this.cells[y][x].setBackground(Color.LIGHT_GRAY);
+                }
+            }
+
+            return;
+        }
+
+        // otherwise solve current situation to display hints
+        this.solveSituation();
     }
 
     public void revealBombs() {
@@ -150,6 +169,7 @@ public class Game extends JFrame{
     }
 
     void solveSituation() {
+
         try {
             ArrayList<ArrayList<Cell>> solvedSituation = solver.solveSituation();
 
@@ -174,9 +194,18 @@ public class Game extends JFrame{
             for(Cell bomb : solvedSituation.get(1)) {
                 bomb.markBomb();
             }
+
+            for(Cell unknown : solvedSituation.get(2)) {
+                unknown.markUnknown();
+            }
         }
         catch (GuessRequiredException e) {
+            for(Cell unknown : e.unknownCells) {
+                unknown.markUnknown();
+            }
+
             System.out.println(e.getMessage());
+
             return;
         }
         // TODO handle the exception that happens on guess required sometimes
@@ -306,7 +335,9 @@ public class Game extends JFrame{
                                 return;
                             }
 
-                            self.solveSituation();
+                            if(self.hintMode) {
+                                self.solveSituation();
+                            }
                         }
                     }
                     public void mousePressed(MouseEvent me) {}

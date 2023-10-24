@@ -1,8 +1,12 @@
 import java.util.*;
 
 class GuessRequiredException extends Exception {
-    GuessRequiredException(int unknownCount, int unrevealedSafe) {
-        super("[GUESS] Total Unknown: " + unknownCount + ", Unrevealed Safe: " + unrevealedSafe );
+
+    ArrayList<Cell> unknownCells;
+
+    GuessRequiredException(ArrayList<Cell> unknownCells, int unrevealedSafe) {
+        super("[GUESS] Total Unknown: " + unknownCells.size() + ", Unrevealed Safe: " + unrevealedSafe );
+        this.unknownCells = unknownCells;
     }
 }
 
@@ -84,7 +88,6 @@ public class Solver {
                     for(Cell unknown : neighboringPossible) {
                         if(!this.foundBombs.contains(unknown) && !this.foundUnknown.contains(unknown)) {
                             this.foundUnknown.add(unknown);
-                            unknown.markUnknown();
                         }
                     }
                 }
@@ -188,12 +191,13 @@ public class Solver {
         // if solved situation has no newly found safe cells 
         // and there are no more safe cells to be revealed
         if (newlyFoundSafe == 0 && newlyFoundBombs == 0 && this.unrevealedSafe <= 0) {
-            throw new GuessRequiredException(this.foundUnknown.size(), this.unrevealedSafe);
+            throw new GuessRequiredException(this.foundUnknown, this.unrevealedSafe);
         }
 
         ArrayList<ArrayList<Cell>> solvedSituation = new ArrayList<ArrayList<Cell>>();
         solvedSituation.add(this.foundSafe);
         solvedSituation.add(this.foundBombs);
+        solvedSituation.add(this.foundUnknown);
 
         return solvedSituation;
     }
