@@ -43,8 +43,15 @@ public class Game extends JFrame{
     public void revealBombs() {
         for(int y = 0; y < this.gridSize; y++) {
             for(int x = 0; x < this.gridSize; x++) {
-                if(this.cells[y][x].isBomb) {
-                    this.cells[y][x].reveal();
+                Cell currentCell = this.cells[y][x];
+
+                // TODO better visuals
+                if(currentCell.isBomb && !currentCell.isFlagged) {
+                    currentCell.reveal();
+                    continue;
+                }
+                if(!currentCell.isBomb && currentCell.isFlagged) {
+                    currentCell.setBackground(Color.MAGENTA);
                 }
             }
         }
@@ -223,6 +230,7 @@ public class Game extends JFrame{
                             if(currentCell.isBomb) {
                                 self.gameOver = true;
                                 self.timer.stop();
+                                currentCell.setBackground(Color.RED);
                                 self.revealBombs();
                                 return;
                             }
