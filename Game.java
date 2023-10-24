@@ -94,12 +94,15 @@ public class Game extends JFrame{
                 if(y < 0 || x < 0 || y >= this.gridSize || x >= this.gridSize) {
                     continue;
                 }
-                // skip if cell is revealed
-                if(this.cells[y][x].isRevealed) {
+
+                Cell currentCell = this.cells[y][x];
+
+                // skip if cell is revealed or flagged
+                if(currentCell.isRevealed || currentCell.isFlagged) {
                     continue;
                 }
 
-                if (this.cells[y][x].isBomb) {
+                if (currentCell.isBomb) {
                     neighboringBombs++;
                 }
             }
@@ -124,8 +127,8 @@ public class Game extends JFrame{
 
                 Cell currentCell = this.cells[currentRow][currentCol];
 
-                // skip if cell is revealed
-                if (currentCell.isRevealed) {
+                // skip if cell is revealed or flagged
+                if (currentCell.isRevealed || currentCell.isFlagged) {
                     continue;
                 }
 
