@@ -207,13 +207,11 @@ public class Game extends JFrame{
 
                         if (SwingUtilities.isRightMouseButton(me)) {
                             currentCell.toggleFlag();
-                            if(!currentCell.isRevealed && self.remainingBombsCount != 0){
+
+                            if(!currentCell.isRevealed){
                                 self.remainingBombsCount += currentCell.isFlagged ? -1 : 1;
                             }
-                            else if(self.remainingBombsCount == 0){
-                                currentCell.setIcon(null);
-                                self.remainingBombsCount++;
-                            }
+
                             remainingLabel.setText(self.remainingBombsCount + " left");
                         }
                         if (SwingUtilities.isLeftMouseButton(me)) {
