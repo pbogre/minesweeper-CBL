@@ -46,6 +46,13 @@ public class Menu extends JFrame {
     }
 
     public Menu(int windowSize) {
+        try {
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        }
+        catch (Exception e){
+            System.out.println("Error setting look and feel");
+        }
+
         this.windowSize = windowSize;
         // default grid size & bomb amount (medium difficulty)
         this.selectedGridSize = 16;
