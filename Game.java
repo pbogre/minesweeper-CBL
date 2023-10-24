@@ -230,6 +230,8 @@ public class Game extends JFrame{
                             if(currentCell.isBomb) {
                                 self.gameOver = true;
                                 self.timer.stop();
+
+                                mainLabel.setText("x(");
                                 currentCell.setBackground(Color.RED);
                                 self.revealBombs();
                                 return;
@@ -244,8 +246,20 @@ public class Game extends JFrame{
                             self.computeNeighboringBombs(currentCell);
                         }
                     }
-                    public void mousePressed(MouseEvent me) {}
-                    public void mouseReleased(MouseEvent me) {}
+                    public void mousePressed(MouseEvent me) {
+                        if(SwingUtilities.isLeftMouseButton(me) && !self.gameOver) {
+                            if(!currentCell.isRevealed) {
+                                mainLabel.setText(":o");
+                            }
+                        }
+                    }
+                    public void mouseReleased(MouseEvent me) {
+                        if(SwingUtilities.isLeftMouseButton(me) && !self.gameOver) {
+                            if(!currentCell.isRevealed) {
+                                mainLabel.setText(":)");
+                            }
+                        }
+                    }
                     public void mouseEntered(MouseEvent me) {}
                     public void mouseExited(MouseEvent me) {}
                 });
