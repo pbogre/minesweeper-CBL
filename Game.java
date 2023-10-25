@@ -190,6 +190,8 @@ public class Game extends JFrame{
         mainLabel.setFont(new Font("Arial", Font.BOLD, 25));
 
         JButton menuButton = new JButton("Menu");
+        menuButton.setFocusPainted(false);
+
         menuButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -198,6 +200,8 @@ public class Game extends JFrame{
         }); 
 
         JButton hintButton = new JButton("Hint");
+        hintButton.setFocusPainted(false);
+        
         hintButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

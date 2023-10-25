@@ -76,11 +76,19 @@ public class Menu extends JFrame {
         selectDifficultyLabel.setFont(new Font("Arial", Font.ITALIC, 18));
 
         JButton startGameButton = new JButton("Start Game");
+        startGameButton.setFocusPainted(false);
 
         JButton easyDifficultyButton = new JButton("Easy");
+        easyDifficultyButton.setFocusPainted(false);
+
         JButton mediumDifficultyButton = new JButton("Medium");
+        mediumDifficultyButton.setFocusPainted(false);
+
         JButton hardDifficultyButton = new JButton("Hard");
+        hardDifficultyButton.setFocusPainted(false);
+
         JButton customDifficultyButton = new JButton("Custom");
+        customDifficultyButton.setFocusPainted(false);
 
         JPanel difficultyPanel = new JPanel();
 
