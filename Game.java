@@ -18,6 +18,8 @@ public class Game extends JFrame{
     public long time;
     public int remainingBombsCount;
 
+    private ImageIcon gameIcon;
+
     public void stop() {
         setVisible(false);
         dispose();
@@ -146,6 +148,9 @@ public class Game extends JFrame{
         this.gridSize = gridSize;
         this.bombAmount = bombAmount;
         this.cells = new Cell[this.gridSize][this.gridSize];
+
+        gameIcon = new ImageIcon(getClass().getResource("/res/logo.png"));
+        setIconImage(gameIcon.getImage());
 
         this.remainingBombsCount = this.bombAmount;
 

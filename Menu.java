@@ -16,6 +16,9 @@ public class Menu extends JFrame {
     private JLabel gridSizeLabel;
     private JLabel bombAmountLabel;
 
+    private ImageIcon menuIcon;
+
+
     public void updateCustomDifficulty() {
         this.gridSizeLabel.setText("Grid size: " + this.gridSizeSlider.getValue());
         this.selectedGridSize = gridSizeSlider.getValue();
@@ -46,6 +49,9 @@ public class Menu extends JFrame {
     }
 
     public Menu(int windowSize) {
+        menuIcon = new ImageIcon(getClass().getResource("/res/logo.png"));
+        setIconImage(menuIcon.getImage());
+        
         try {
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         }
