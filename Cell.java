@@ -14,15 +14,15 @@ public class Cell extends JButton {
     public boolean isRevealed;
 
     void markUnknown() {
-        setBackground(new ColorUIResource(255, 255, 0));
+        this.setBackground(Color.YELLOW);
     }
 
     void markSafe() {
-        setBackground(new ColorUIResource(0, 255, 0));
+        this.setBackground(Color.GREEN);
     }
 
     void markBomb() {
-        setBackground(new ColorUIResource(255, 0, 0));
+        this.setBackground(Color.RED);
     }
 
     void makeBomb() {
