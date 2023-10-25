@@ -3,7 +3,17 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 import java.awt.event.*;
+
 import javax.swing.Timer;
+
+import java.io.IOException; 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+
+
 
 public class Game extends JFrame{
     public boolean firstCellRevealed;
@@ -19,6 +29,7 @@ public class Game extends JFrame{
     public int remainingBombsCount;
 
     private ImageIcon gameIcon;
+
 
     public void stop() {
         setVisible(false);
@@ -235,9 +246,24 @@ public class Game extends JFrame{
                             if(currentCell.isFlagged) {
                                 return;
                             }
-                            if(currentCell.isBomb) {
+                            if (currentCell.isBomb) {
                                 self.gameOver = true;
                                 self.timer.stop();
+                                try {    
+                                    AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(getClass()
+                                    .getResource("/res/explosion.wav"));
+                                    
+                                    Clip clip = AudioSystem.getClip();
+                                    clip.open(audioInputStream);
+                                    clip.start();
+
+                                } catch (UnsupportedAudioFileException e) {
+                                    e.printStackTrace();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                } catch (LineUnavailableException e) {
+                                    e.printStackTrace();
+                                }
 
                                 mainLabel.setText("x(");
                                 currentCell.setBackground(Color.RED);
