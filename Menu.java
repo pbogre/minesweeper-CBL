@@ -48,8 +48,8 @@ public class Menu extends JFrame {
     public Menu(int windowSize) {
         this.windowSize = windowSize;
         // default grid size & bomb amount (medium difficulty)
-        this.selectedGridSize = 16;
-        this.selectedBombAmount = 40;
+        this.selectedGridSize = 20;
+        this.selectedBombAmount = 80;
 
         setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
@@ -72,10 +72,10 @@ public class Menu extends JFrame {
         JPanel difficultyPanel = new JPanel();
 
         this.gridSizeSlider = new JSlider(JSlider.HORIZONTAL, 5, 35, this.selectedGridSize);
-        this.bombAmountSlider = new JSlider(JSlider.HORIZONTAL, 0, 99, this.selectedBombAmount);
+        this.bombAmountSlider = new JSlider(JSlider.HORIZONTAL, 0, 99, (100 * this.selectedBombAmount) / (this.selectedGridSize * this.selectedGridSize));
 
         this.gridSizeLabel = new JLabel("Grid size: " + gridSizeSlider.getValue());
-        this.bombAmountLabel = new JLabel("Bomb / Cells: " + bombAmountSlider.getValue() + "% (" + this.selectedBombAmount + " total)");
+        this.bombAmountLabel = new JLabel("Bombs / Cells: " + bombAmountSlider.getValue() + "% (" + this.selectedBombAmount + " total)");
 
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -124,6 +124,8 @@ public class Menu extends JFrame {
         constraints.gridy = 7;
         bombAmountLabel.setVisible(false);
         add(bombAmountLabel, constraints);
+
+        this.setDifficulty(this.selectedGridSize, this.selectedBombAmount);
 
         Menu self = this;
         startGameButton.addActionListener(new ActionListener() {

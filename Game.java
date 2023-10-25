@@ -72,8 +72,15 @@ public class Game extends JFrame{
     public void revealBombs() {
         for(int y = 0; y < this.gridSize; y++) {
             for(int x = 0; x < this.gridSize; x++) {
-                if(this.cells[y][x].isBomb) {
-                    this.cells[y][x].reveal();
+                Cell currentCell = this.cells[y][x];
+
+                // TODO better visuals
+                if(currentCell.isBomb && !currentCell.isFlagged) {
+                    currentCell.reveal();
+                    continue;
+                }
+                if(!currentCell.isBomb && currentCell.isFlagged) {
+                    currentCell.setBackground(Color.MAGENTA);
                 }
             }
         }
@@ -125,7 +132,7 @@ public class Game extends JFrame{
                 if(y < 0 || x < 0 || y >= this.gridSize || x >= this.gridSize) {
                     continue;
                 }
-    
+
                 Cell currentCell = this.cells[y][x];
 
                 // skip if cell is revealed or flagged
@@ -300,8 +307,10 @@ public class Game extends JFrame{
                         if (SwingUtilities.isRightMouseButton(me)) {
                             currentCell.toggleFlag();
 
-                            self.remainingBombsCount += currentCell.isFlagged ? -1 : 1;
-                            remainingLabel.setText(self.remainingBombsCount + " left");
+                            if(!currentCell.isRevealed){
+                                self.remainingBombsCount += currentCell.isFlagged ? -1 : 1;
+                                remainingLabel.setText(self.remainingBombsCount + " left");
+                            }
                         }
                         if (SwingUtilities.isLeftMouseButton(me)) {
                             if(currentCell.isFlagged) {
@@ -310,6 +319,7 @@ public class Game extends JFrame{
                             else if(currentCell.isBomb) {
                                 self.gameOver = true;
                                 self.timer.stop();
+                                currentCell.setBackground(Color.RED);
                                 self.revealBombs();
 
                                 System.out.println("Game lost");
@@ -321,6 +331,7 @@ public class Game extends JFrame{
 
                             if(!firstCellRevealed) {
                                 self.populateBombs(currentCell);
+                                self.timer.start();
                                 firstCellRevealed = true;
                             }
 
@@ -361,6 +372,5 @@ public class Game extends JFrame{
                 timeLabel.setText(String.valueOf(time) + "s");
             }
         });
-        this.timer.start();
     }
 }
