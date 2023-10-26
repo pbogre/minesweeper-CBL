@@ -11,6 +11,8 @@ public class Menu extends JFrame {
     public int selectedGridSize;
     public int selectedBombAmount;
 
+    private JLabel selectDifficultyLabel;
+
     private JSlider gridSizeSlider;
     private JSlider bombAmountSlider;
     private JLabel gridSizeLabel;
@@ -25,6 +27,16 @@ public class Menu extends JFrame {
 
         this.selectedBombAmount = (int)(this.selectedGridSize * this.selectedGridSize * (double)(this.bombAmountSlider.getValue() / 100.0));
         this.bombAmountLabel.setText("Bombs / Cells: " + this.bombAmountSlider.getValue() + "% (" + this.selectedBombAmount + " total)");
+
+        if (this.selectedGridSize == 10 && this.selectedBombAmount == 15) {
+            this.selectDifficultyLabel.setText("Select Difficulty (Easy)");
+        } else if (this.selectedGridSize == 20 && this.selectedBombAmount == 60) {
+            this.selectDifficultyLabel.setText("Select Difficulty (Medium)");
+        } else if (this.selectedGridSize == 30 && this.selectedBombAmount == 135) {
+            this.selectDifficultyLabel.setText("Select Difficulty (Hard)");
+        } else {
+            this.selectDifficultyLabel.setText("Select Difficulty (Custom)");
+        }
     }
 
     public void setDifficulty(int gridSize, int bombAmount) {
@@ -72,8 +84,8 @@ public class Menu extends JFrame {
         JLabel titleLabel = new JLabel("Minesweeper");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 40));
 
-        JLabel selectDifficultyLabel = new JLabel("Select Difficulty");
-        selectDifficultyLabel.setFont(new Font("Arial", Font.ITALIC, 18));
+        this.selectDifficultyLabel = new JLabel("Select Difficulty (Medium)");
+        this.selectDifficultyLabel.setFont(new Font("Arial", Font.ITALIC, 18));
 
         JButton startGameButton = new JButton("Start Game");
         startGameButton.setFocusPainted(false);
@@ -177,7 +189,7 @@ public class Menu extends JFrame {
         hardDifficultyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                self.setDifficulty(35, 185);
+                self.setDifficulty(30, 135);
                 self.updateCustomDifficulty();
             }
         });
