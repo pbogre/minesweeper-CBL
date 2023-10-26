@@ -333,6 +333,7 @@ public class Game extends JFrame{
                             else if(currentCell.isBomb) {
                                 self.gameOver = true;
                                 self.timer.stop();
+
                                 try {    
                                     AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(getClass()
                                     .getResource("/res/explosion.wav"));
@@ -372,6 +373,8 @@ public class Game extends JFrame{
                             catch (GameWonException e) {
                                 self.gameOver = true;
                                 self.timer.stop();
+
+                                mainLabel.setText("B)");
 
                                 System.out.println(e.getMessage());
                                 return;
