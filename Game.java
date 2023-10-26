@@ -66,7 +66,7 @@ public class Game extends JFrame{
                         continue;
                     }
 
-                    this.cells[y][x].setBackground(Color.LIGHT_GRAY);
+                    this.cells[y][x].setBackground(new Color(180, 180, 180));
                 }
             }
 
