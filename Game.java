@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.Timer;
-
+import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -343,8 +343,10 @@ public class Game extends JFrame{
                                 }
 
                                 mainLabel.setText("x(");
-                                currentCell.setBackground(Color.RED);
                                 self.revealBombs();
+
+                                ImageIcon explosionIcon = new ImageIcon(getClass().getResource("/res/explosion.png"));
+                                currentCell.setIcon(new ImageIcon(explosionIcon.getImage().getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH)));
 
                                 System.out.println("Game lost");
                                 return;
