@@ -2,7 +2,12 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.Timer;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 
 import java.util.*;
 
@@ -28,6 +33,9 @@ public class Game extends JFrame{
     public long time;
     public int remainingBombsCount;
 
+    private ImageIcon gameIcon;
+
+
     public void stop() {
         setVisible(false);
         dispose();
@@ -50,7 +58,8 @@ public class Game extends JFrame{
         }
 
         // if disabling hint mode, reset color of all cells unrevealed
-        if(!this.hintMode) {
+        // also do this if gameover
+        if(!this.hintMode || this.gameOver) {
             for(int y = 0; y < this.gridSize; y++) {
                 for(int x = 0; x < this.gridSize; x++) {
 
@@ -58,7 +67,7 @@ public class Game extends JFrame{
                         continue;
                     }
 
-                    this.cells[y][x].setBackground(Color.LIGHT_GRAY);
+                    this.cells[y][x].setBackground(new Color(180, 180, 180));
                 }
             }
 
@@ -74,7 +83,6 @@ public class Game extends JFrame{
             for(int x = 0; x < this.gridSize; x++) {
                 Cell currentCell = this.cells[y][x];
 
-                // TODO better visuals
                 if(currentCell.isBomb && !currentCell.isFlagged) {
                     currentCell.reveal();
                     continue;
@@ -230,6 +238,9 @@ public class Game extends JFrame{
 
         this.solver = new Solver(this);
 
+        gameIcon = new ImageIcon(getClass().getResource("/res/logo.png"));
+        setIconImage(gameIcon.getImage());
+
         this.remainingBombsCount = this.bombAmount;
 
         Game self = this; // utility
@@ -257,6 +268,8 @@ public class Game extends JFrame{
         mainLabel.setFont(new Font("Arial", Font.BOLD, 25));
 
         JButton menuButton = new JButton("Menu");
+        menuButton.setFocusPainted(false);
+
         menuButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -265,10 +278,11 @@ public class Game extends JFrame{
         }); 
 
         JButton hintButton = new JButton("Hint");
+        hintButton.setFocusPainted(false);
+        
         hintButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // toggle hint mode
                 self.toggleHintMode();
             }
         }); 
@@ -314,9 +328,26 @@ public class Game extends JFrame{
                             }
                             else if(currentCell.isBomb) {
                                 self.gameOver = true;
+                                self.toggleHintMode();
                                 self.timer.stop();
-                                currentCell.setBackground(Color.RED);
+
+                                try {    
+                                    AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(getClass()
+                                    .getResource("/res/explosion.wav"));
+                                    
+                                    Clip clip = AudioSystem.getClip();
+                                    clip.open(audioInputStream);
+                                    clip.start();
+
+                                } catch (Exception e) {
+                                    System.out.println("Could not play audio file");
+                                }
+
+                                mainLabel.setText("x(");
                                 self.revealBombs();
+
+                                ImageIcon explosionIcon = new ImageIcon(getClass().getResource("/res/explosion.png"));
+                                currentCell.setIcon(new ImageIcon(explosionIcon.getImage().getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH)));
 
                                 System.out.println("Game lost");
                                 return;
@@ -336,7 +367,10 @@ public class Game extends JFrame{
                             }
                             catch (GameWonException e) {
                                 self.gameOver = true;
+                                self.toggleHintMode();
                                 self.timer.stop();
+
+                                mainLabel.setText("B)");
 
                                 System.out.println(e.getMessage());
                                 return;
@@ -347,8 +381,20 @@ public class Game extends JFrame{
                             }
                         }
                     }
-                    public void mousePressed(MouseEvent me) {}
-                    public void mouseReleased(MouseEvent me) {}
+                    public void mousePressed(MouseEvent me) {
+                        if(SwingUtilities.isLeftMouseButton(me) && !self.gameOver) {
+                            if(!currentCell.isRevealed) {
+                                mainLabel.setText(":o");
+                            }
+                        }
+                    }
+                    public void mouseReleased(MouseEvent me) {
+                        if(SwingUtilities.isLeftMouseButton(me) && !self.gameOver) {
+                            if(!currentCell.isRevealed) {
+                                mainLabel.setText(":)");
+                            }
+                        }
+                    }
                     public void mouseEntered(MouseEvent me) {}
                     public void mouseExited(MouseEvent me) {}
                 });

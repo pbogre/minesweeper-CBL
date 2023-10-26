@@ -81,8 +81,8 @@ public class Cell extends JButton {
             return;
         }
 
-        setBackground(Color.GRAY);
-        setBorder(BorderFactory.createLoweredBevelBorder());
+        setBackground(Color.LIGHT_GRAY);
+        setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
     }
 
     void toggleFlag() {
@@ -106,7 +106,7 @@ public class Cell extends JButton {
         this.row = row;
         this.col = col;
 
-        setBackground(Color.LIGHT_GRAY);
+        setBackground(new Color(180, 180, 180));
         setBorder(BorderFactory.createRaisedBevelBorder());
 
         setText("");

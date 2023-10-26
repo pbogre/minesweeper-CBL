@@ -16,6 +16,9 @@ public class Menu extends JFrame {
     private JLabel gridSizeLabel;
     private JLabel bombAmountLabel;
 
+    private ImageIcon menuIcon;
+
+
     public void updateCustomDifficulty() {
         this.gridSizeLabel.setText("Grid size: " + this.gridSizeSlider.getValue());
         this.selectedGridSize = gridSizeSlider.getValue();
@@ -46,6 +49,16 @@ public class Menu extends JFrame {
     }
 
     public Menu(int windowSize) {
+        menuIcon = new ImageIcon(getClass().getResource("/res/logo.png"));
+        setIconImage(menuIcon.getImage());
+        
+        try {
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        }
+        catch (Exception e){
+            System.out.println("Error setting look and feel");
+        }
+
         this.windowSize = windowSize;
         // default grid size & bomb amount (medium difficulty)
         this.selectedGridSize = 20;
@@ -63,11 +76,19 @@ public class Menu extends JFrame {
         selectDifficultyLabel.setFont(new Font("Arial", Font.ITALIC, 18));
 
         JButton startGameButton = new JButton("Start Game");
+        startGameButton.setFocusPainted(false);
 
         JButton easyDifficultyButton = new JButton("Easy");
+        easyDifficultyButton.setFocusPainted(false);
+
         JButton mediumDifficultyButton = new JButton("Medium");
+        mediumDifficultyButton.setFocusPainted(false);
+
         JButton hardDifficultyButton = new JButton("Hard");
+        hardDifficultyButton.setFocusPainted(false);
+
         JButton customDifficultyButton = new JButton("Custom");
+        customDifficultyButton.setFocusPainted(false);
 
         JPanel difficultyPanel = new JPanel();
 
