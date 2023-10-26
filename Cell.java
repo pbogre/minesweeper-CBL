@@ -13,22 +13,41 @@ public class Cell extends JButton {
     public boolean isFlagged;
     public boolean isRevealed;
 
+    /**
+     * The markUnknown function sets the background color of the cell to yellow if it's unsure.
+     */
     void markUnknown() {
         this.setBackground(Color.YELLOW);
     }
 
+    /**
+     * The markSafe() function sets the background color of the cell to green if it is clear.
+     */
     void markSafe() {
         this.setBackground(Color.GREEN);
     }
 
+    /**
+     * The markBomb() function changes the background color to red if it is a bomb.
+     */
     void markBomb() {
         this.setBackground(Color.RED);
     }
 
+    /**
+     * The function "makeBomb" sets the "isBomb" variable to true.
+     */
     void makeBomb() {
         this.isBomb = true;
     }
 
+    /**
+     * The function sets the number of neighboring bombs and updates the icon of the cell based on the
+     * number of neighboring bombs.
+     * 
+     * @param neighboringBombs The parameter `neighboringBombs` represents the number of neighboring
+     * bombs around a particular cell in a game.
+     */
     void setNeighboringBombs(int neighboringBombs) {
         ImageIcon icon;
         this.neighboringBombs = neighboringBombs;
@@ -72,6 +91,10 @@ public class Cell extends JButton {
         }
     }
 
+    /**
+     * The `reveal` function updates the appearance of a component based on its properties, such as
+     * setting an icon if it represents a bomb or changing the background color and border.
+     */
     void reveal() {
         this.isRevealed = true;
 
@@ -85,6 +108,9 @@ public class Cell extends JButton {
         setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
     }
 
+    /**
+     * The function toggles a flag on a cell and updates its icon accordingly.
+     */
     void toggleFlag() {
         if(this.isRevealed){
             return;
@@ -102,6 +128,8 @@ public class Cell extends JButton {
         }
     }
 
+    // The `Cell(int row, int col)` constructor is initializing a new instance of the `Cell` class with
+    // the given `row` and `col` parameters.
     Cell(int row, int col) {
         this.row = row;
         this.col = col;
@@ -112,6 +140,14 @@ public class Cell extends JButton {
         setText("");
     }
 
+    /**
+     * The equals() function checks if two Cell objects have the same row and column values.
+     * 
+     * @param obj The "obj" parameter is an object that is being compared to the current object for
+     * equality.
+     * @return The method is returning a boolean value, which indicates whether the current object is
+     * equal to the object being compared.
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -122,6 +158,13 @@ public class Cell extends JButton {
                col == cell.col;
     }
 
+    /**
+     * The hashCode() function in Java returns the hash code value for the object based on the values
+     * of the row and col variables.
+     * 
+     * @return The method is returning the hash code of the combination of the "row" and "col"
+     * variables.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(row, col);

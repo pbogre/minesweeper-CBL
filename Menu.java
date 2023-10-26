@@ -19,6 +19,10 @@ public class Menu extends JFrame {
     private ImageIcon menuIcon;
 
 
+    /**
+     * The function updates the labels for grid size and bomb amount based on the values of the
+     * corresponding sliders.
+     */
     public void updateCustomDifficulty() {
         this.gridSizeLabel.setText("Grid size: " + this.gridSizeSlider.getValue());
         this.selectedGridSize = gridSizeSlider.getValue();
@@ -27,6 +31,15 @@ public class Menu extends JFrame {
         this.bombAmountLabel.setText("Bombs / Cells: " + this.bombAmountSlider.getValue() + "% (" + this.selectedBombAmount + " total)");
     }
 
+    /**
+     * The function sets the difficulty level by updating the selected grid size and bomb amount, and
+     * adjusting the values of the gridSizeSlider and bombAmountSlider accordingly.
+     * 
+     * @param gridSize The gridSize parameter represents the size of the grid. It determines the number
+     * of rows and columns in the grid.
+     * @param bombAmount The bombAmount parameter represents the number of bombs that will be placed on
+     * the game grid.
+     */
     public void setDifficulty(int gridSize, int bombAmount) {
         this.selectedGridSize = gridSize;
         this.selectedBombAmount = bombAmount;
@@ -35,6 +48,9 @@ public class Menu extends JFrame {
         this.bombAmountSlider.setValue((100 * bombAmount) / (gridSize * gridSize));
     }
     
+   /**
+    * This function sets up and displays a JFrame window with a specified size and title.
+    */
     public void run() {
         setTitle("Menu");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -43,11 +59,17 @@ public class Menu extends JFrame {
         setVisible(true);
     }
 
+    /**
+     * The "stop" function hides and disposes of the current window.
+     */
     public void stop() {
         setVisible(false);
         dispose();
     }
 
+    // The above code is defining a class called "Menu" in Java. This class represents a menu screen
+    // for a Minesweeper game. The constructor takes a parameter "windowSize" which determines the size
+    // of the menu window.
     public Menu(int windowSize) {
         menuIcon = new ImageIcon(getClass().getResource("/res/logo.png"));
         setIconImage(menuIcon.getImage());

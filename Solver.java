@@ -17,6 +17,12 @@ public class Solver {
     public ArrayList<Cell> foundUnknown;
     private Game game;
 
+    /**
+     * The function removes a cell from the list of found unknown cells and decreases the count of
+     * unrevealed safe cells if the cell is also found to be safe.
+     * 
+     * @param cell The parameter "cell" represents a specific cell in a game or grid.
+     */
     public void reveal(Cell cell) {
         if(this.foundSafe.contains(cell)) {
             this.unrevealedSafe--;
@@ -36,6 +42,14 @@ public class Solver {
     //      neighboringBombCount++
     //   if neighboringBombCount == this cell's neighboringBombs
     //     all unrevealed neighboring cells that aren't 100% bombs must be safe
+
+    /**
+     * The function `computeSafe()` iterates through the cells of a game grid and determines if a cell
+     * is safe based on the number of neighboring bombs and the cells that have already been revealed.
+     * 
+     * @return The method `computeSafe()` returns an integer value, which represents the number of
+     * newly found safe cells.
+     */
     private int computeSafe() {
         int newlyFoundSafe = 0;
 
@@ -110,6 +124,14 @@ public class Solver {
     //     possibleBombCount++
     //   if possibleBombCount == this cell's neighboringBombs 
     //     all unrevealed neighboring cells that aren't 100% safe are bombs
+
+    /**
+     * The function computes the number of newly found bombs based on the neighboring cells of revealed
+     * cells in a game grid.
+     * 
+     * @return The method `computeBombs()` returns an integer value, which represents the number of
+     * newly found bombs.
+     */
     private int computeBombs() {
         int newlyFoundBombCount = 0;
 
@@ -173,6 +195,15 @@ public class Solver {
     //
     // bombs are computed before safe cells because at least 
     // some 100% bombs are required to find 100% safe cells
+
+    /**
+     * The function "solveSituation" attempts to solve a situation by iteratively computing the number
+     * of bombs and safe cells until no new bombs or safe cells are found, and then returns the solved
+     * situation as an ArrayList of ArrayLists containing the found safe cells, found bombs, and found
+     * unknown cells.
+     * 
+     * @return The method is returning an ArrayList of ArrayLists of Cell objects.
+     */
     public ArrayList<ArrayList<Cell>> solveSituation() throws GuessRequiredException {
 
         int newlyFoundBombs = computeBombs();
@@ -202,6 +233,11 @@ public class Solver {
         return solvedSituation;
     }
 
+    // The `Solver(Game game)` constructor initializes a new instance of the `Solver` class. It takes a
+    // `Game` object as a parameter and assigns it to the `game` instance variable. It also initializes
+    // the `unrevealedSafe` variable to 0 and creates new `ArrayList` objects for `foundBombs`,
+    // `foundSafe`, and `foundUnknown`. These lists will be used to store the cells that are found to
+    // be bombs, safe, and unknown, respectively, during the solving process.
     Solver(Game game) {
         this.game = game;
         this.unrevealedSafe = 0;

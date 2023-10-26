@@ -36,6 +36,10 @@ public class Game extends JFrame{
     private ImageIcon gameIcon;
 
 
+    /**
+     * The stop() function hides the current window, disposes of it, and then creates and runs a new
+     * Menu window.
+     */
     public void stop() {
         setVisible(false);
         dispose();
@@ -44,12 +48,20 @@ public class Game extends JFrame{
         menu.run();
     }
 
+    /**
+     * The function sets the location of the JFrame to the center of the screen, sets the default close
+     * operation to exit the program when the frame is closed, and makes the frame visible.
+     */
     public void run() {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
     }
 
+    /**
+     * The function toggles the hint mode and updates the color of cells based on whether hint mode is
+     * enabled or disabled.
+     */
     public void toggleHintMode() {
         this.hintMode = !this.hintMode;
 
@@ -78,6 +90,9 @@ public class Game extends JFrame{
         this.solveSituation();
     }
 
+    /**
+     * The function reveals all the bombs on the grid and highlights any incorrectly flagged cells.
+     */
     public void revealBombs() {
         for(int y = 0; y < this.gridSize; y++) {
             for(int x = 0; x < this.gridSize; x++) {
@@ -94,6 +109,13 @@ public class Game extends JFrame{
         }
     }
 
+    /**
+     * The function populates the game grid with a specified number of bombs, excluding a specified
+     * exception cell.
+     * 
+     * @param exceptionCell The exceptionCell parameter is a Cell object that represents the first cell
+     * that has been revealed. This cell is excluded from being populated with a bomb.
+     */
     public void populateBombs(Cell exceptionCell) {
         Random random = new Random();
         int remainingBombs = this.bombAmount;
@@ -117,6 +139,14 @@ public class Game extends JFrame{
         }
     }
 
+    /**
+     * The function computes the number of neighboring bombs for a given cell in a Minesweeper game and
+     * recursively reveals its neighbors if there are no adjacent bombs. So every totally empty cell with no neighboring bombs
+     * is revealed and the cells with neighboring bombs are updated with the number of neighboring bombs.
+     * 
+     * @param cell The parameter "cell" is an object of the class "Cell". It represents a single cell
+     * in a grid.
+     */
     public void computeNeighboringBombs(Cell cell) throws GameWonException {
 
         cell.reveal();
@@ -179,6 +209,10 @@ public class Game extends JFrame{
         }
     }
 
+    /**
+     * The function attempts to solve a Minesweeper situation by marking cells as safe, bombs, or
+     * unknown based on the solver's output.
+     */
     void solveSituation() {
 
         try {
@@ -225,6 +259,8 @@ public class Game extends JFrame{
         }
     }
 
+    // The above code is defining a constructor for a Game class in Java. The constructor takes in two
+    // parameters: gridSize and bombAmount.
     public Game(int gridSize, int bombAmount){
         this.firstCellRevealed = false;
         this.gameOver = false;
