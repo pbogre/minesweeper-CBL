@@ -58,7 +58,8 @@ public class Game extends JFrame{
         }
 
         // if disabling hint mode, reset color of all cells unrevealed
-        if(!this.hintMode) {
+        // also do this if gameover
+        if(!this.hintMode || this.gameOver) {
             for(int y = 0; y < this.gridSize; y++) {
                 for(int x = 0; x < this.gridSize; x++) {
 
@@ -327,6 +328,7 @@ public class Game extends JFrame{
                             }
                             else if(currentCell.isBomb) {
                                 self.gameOver = true;
+                                self.toggleHintMode();
                                 self.timer.stop();
 
                                 try {    
@@ -365,6 +367,7 @@ public class Game extends JFrame{
                             }
                             catch (GameWonException e) {
                                 self.gameOver = true;
+                                self.toggleHintMode();
                                 self.timer.stop();
 
                                 mainLabel.setText("B)");
