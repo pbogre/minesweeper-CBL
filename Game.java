@@ -21,6 +21,7 @@ public class Game extends JFrame{
     public boolean firstCellRevealed;
     public boolean gameOver;
     public boolean hintMode;
+    public boolean autoSolve;
     public int gridSize;
     public int cellSize;
     public int bombAmount;
@@ -30,11 +31,11 @@ public class Game extends JFrame{
     public Solver solver;
 
     public Timer timer;
+    public JLabel mainLabel;
     public long time;
     public int remainingBombsCount;
 
     private ImageIcon gameIcon;
-
 
     public void stop() {
         setVisible(false);
@@ -50,7 +51,7 @@ public class Game extends JFrame{
         setVisible(true);
     }
 
-    public void toggleHintMode() {
+    public void updateHintMode() {
         this.hintMode = !this.hintMode;
 
         if (!this.firstCellRevealed) {
@@ -76,6 +77,19 @@ public class Game extends JFrame{
 
         // otherwise solve current situation to display hints
         this.solveSituation();
+    }
+
+    public void toggleAutoMode() {
+       this.autoSolve = !this.autoSolve;
+       System.out.println("Auto mode " + (this.autoSolve ? "ON" : "OFF"));
+
+       if(!this.autoSolve || !this.hintMode) {
+           return;
+       }
+
+       this.solveSituation();
+
+       return;
     }
 
     public void revealBombs() {
@@ -121,11 +135,6 @@ public class Game extends JFrame{
 
         cell.reveal();
         this.revealedCount++;
-
-        if (this.gridSize * this.gridSize - this.revealedCount == this.bombAmount) {
-            throw new GameWonException();
-        }
-
         this.solver.reveal(cell);
 
         int neighboringBombs = 0;
@@ -177,36 +186,52 @@ public class Game extends JFrame{
                 computeNeighboringBombs(currentCell);
             }
         }
+
+        // throw GameWonException at the end so that
+        // the neighboringBombs count is set also for the 
+        // final cells
+        if (this.gridSize * this.gridSize - this.revealedCount == this.bombAmount) {
+            throw new GameWonException();
+        }
     }
 
     void solveSituation() {
-
         try {
-            ArrayList<ArrayList<Cell>> solvedSituation = solver.solveSituation();
+            ArrayList<ArrayList<Cell>> solvedSituation = this.solver.solveSituation();
 
-            for(Cell safe : solvedSituation.get(0)) {
-                if(!this.cells[safe.row][safe.col].isRevealed) {
+            for (Cell safe : solvedSituation.get(0)) {
+                if (!this.cells[safe.row][safe.col].isRevealed) {
                     safe.markSafe();
 
-                    // uncomment stuff below for recursive solver 
-                    // i.e., automatically win games if possible
-                    //try {
-                    //    this.computeNeighboringBombs(this.cells[safe.row][safe.col]);
-                    //}
-                    //catch (GameWonException e) {
-                    //    System.out.println(e.getMessage());
-                    //    this.gameOver = true;
-                    //}
+                    if (!this.autoSolve) {
+                        continue;
+                    }
 
-                    //this.solveSituation();
+                    try {
+                        this.computeNeighboringBombs(this.cells[safe.row][safe.col]);
+                    }
+                    catch (GameWonException e) {
+                        this.handleGameWon();
+                        System.out.println(e.getMessage());
+
+                        return;
+                    }
                 }
             }
+     
+            if (this.autoSolve){
+                this.solveSituation();
+            }
 
-            for(Cell bomb : solvedSituation.get(1)) {
+            if (this.gameOver) {
+                return;
+            }
+
+            for (Cell bomb : solvedSituation.get(1)) {
                 bomb.markBomb();
             }
 
-            for(Cell unknown : solvedSituation.get(2)) {
+            for (Cell unknown : solvedSituation.get(2)) {
                 unknown.markUnknown();
             }
         }
@@ -219,16 +244,21 @@ public class Game extends JFrame{
 
             return;
         }
-        // TODO handle the exception that happens on guess required sometimes
-        catch (Exception e) {
-            System.out.println("AN EXCEPTION OCCURED");
-        }
+    }
+
+    void handleGameWon() {
+        this.gameOver = true;
+        this.updateHintMode();
+        this.timer.stop();
+
+        this.mainLabel.setText("B)");
     }
 
     public Game(int gridSize, int bombAmount){
         this.firstCellRevealed = false;
         this.gameOver = false;
         this.hintMode = false;
+        this.autoSolve = false;
         this.cellSize = 35;
         this.gridSize = gridSize;
         this.bombAmount = bombAmount;
@@ -245,7 +275,7 @@ public class Game extends JFrame{
 
         Game self = this; // utility
 
-        setMinimumSize(new Dimension(500, 500));
+        setMinimumSize(new Dimension(650, 650));
         setSize(gridSize * cellSize, gridSize * cellSize);
 
         JPanel mineFieldPanel = new JPanel();
@@ -264,8 +294,8 @@ public class Game extends JFrame{
         JLabel remainingLabel = new JLabel(this.remainingBombsCount + " left");
         remainingLabel.setFont(new Font("Arial", Font.BOLD, 18));
 
-        JLabel mainLabel = new JLabel(":)");
-        mainLabel.setFont(new Font("Arial", Font.BOLD, 25));
+        this.mainLabel = new JLabel(":)");
+        this.mainLabel.setFont(new Font("Arial", Font.BOLD, 25));
 
         JButton menuButton = new JButton("Menu");
         menuButton.setFocusPainted(false);
@@ -283,17 +313,28 @@ public class Game extends JFrame{
         hintButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                self.toggleHintMode();
+                self.updateHintMode();
+            }
+        }); 
+
+        JButton autoButton = new JButton("Auto");
+        autoButton.setFocusPainted(false);
+        
+        autoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                self.toggleAutoMode();
             }
         }); 
 
         leftAlignPanel.add(timeLabel);
         leftAlignPanel.add(remainingLabel);
 
-        centerAlignPanel.add(mainLabel);
+        centerAlignPanel.add(this.mainLabel);
 
         rightAlignPanel.add(menuButton);
         rightAlignPanel.add(hintButton);
+        rightAlignPanel.add(autoButton);
 
         gameStatsPanel.setLayout(new GridLayout());
         gameStatsPanel.add(leftAlignPanel);
@@ -328,7 +369,7 @@ public class Game extends JFrame{
                             }
                             else if(currentCell.isBomb) {
                                 self.gameOver = true;
-                                self.toggleHintMode();
+                                self.updateHintMode();
                                 self.timer.stop();
 
                                 try {    
@@ -343,7 +384,7 @@ public class Game extends JFrame{
                                     System.out.println("Could not play audio file");
                                 }
 
-                                mainLabel.setText("x(");
+                                self.mainLabel.setText("x(");
                                 self.revealBombs();
 
                                 ImageIcon explosionIcon = new ImageIcon(getClass().getResource("/res/explosion.png"));
@@ -366,13 +407,9 @@ public class Game extends JFrame{
                                 self.computeNeighboringBombs(currentCell);
                             }
                             catch (GameWonException e) {
-                                self.gameOver = true;
-                                self.toggleHintMode();
-                                self.timer.stop();
-
-                                mainLabel.setText("B)");
-
+                                self.handleGameWon();
                                 System.out.println(e.getMessage());
+
                                 return;
                             }
 
@@ -384,14 +421,14 @@ public class Game extends JFrame{
                     public void mousePressed(MouseEvent me) {
                         if(SwingUtilities.isLeftMouseButton(me) && !self.gameOver) {
                             if(!currentCell.isRevealed) {
-                                mainLabel.setText(":o");
+                                self.mainLabel.setText(":o");
                             }
                         }
                     }
                     public void mouseReleased(MouseEvent me) {
                         if(SwingUtilities.isLeftMouseButton(me) && !self.gameOver) {
                             if(!currentCell.isRevealed) {
-                                mainLabel.setText(":)");
+                                self.mainLabel.setText(":)");
                             }
                         }
                     }
