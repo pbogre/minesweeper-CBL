@@ -62,7 +62,7 @@ public class Menu extends JFrame {
         this.windowSize = windowSize;
         // default grid size & bomb amount (medium difficulty)
         this.selectedGridSize = 20;
-        this.selectedBombAmount = 80;
+        this.selectedBombAmount = 60;
 
         setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
@@ -163,28 +163,27 @@ public class Menu extends JFrame {
         easyDifficultyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                self.setDifficulty(10, 10);
+                self.setDifficulty(10, 15);
                 self.updateCustomDifficulty();
             }
         });
         mediumDifficultyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                self.setDifficulty(20, 80);
+                self.setDifficulty(20, 60);
                 self.updateCustomDifficulty();
             }
         });
         hardDifficultyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                self.setDifficulty(35, 245);
+                self.setDifficulty(35, 185);
                 self.updateCustomDifficulty();
             }
         });
         customDifficultyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
                     gridSizeSlider.setVisible(!gridSizeSlider.isVisible());
                     gridSizeLabel.setVisible(!gridSizeLabel.isVisible());
                     bombAmountSlider.setVisible(!bombAmountSlider.isVisible());
