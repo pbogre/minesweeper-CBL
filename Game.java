@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.Timer;
-import javax.imageio.ImageIO;
+
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -82,7 +82,6 @@ public class Game extends JFrame{
             for(int x = 0; x < this.gridSize; x++) {
                 Cell currentCell = this.cells[y][x];
 
-                // TODO better visuals
                 if(currentCell.isBomb && !currentCell.isFlagged) {
                     currentCell.reveal();
                     continue;
