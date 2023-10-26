@@ -120,10 +120,6 @@ public class Game extends JFrame{
 
         this.solver.reveal(cell);
 
-        if(cell.isBomb) {
-            return;
-        }
-
         int neighboringBombs = 0;
 
         for(int y = cell.row - 1; y <= cell.row + 1; y++) {
@@ -135,8 +131,8 @@ public class Game extends JFrame{
 
                 Cell currentCell = this.cells[y][x];
 
-                // skip if cell is revealed or flagged
-                if(currentCell.isRevealed || currentCell.isFlagged) {
+                // skip if cell is revealed
+                if(currentCell.isRevealed) {
                     continue;
                 }
 
@@ -165,8 +161,8 @@ public class Game extends JFrame{
 
                 Cell currentCell = this.cells[currentRow][currentCol];
 
-                // skip if cell is revealed or flagged
-                if (currentCell.isRevealed || currentCell.isFlagged) {
+                // skip if cell is revealed, flagged, or a bomb
+                if (currentCell.isRevealed || currentCell.isFlagged || currentCell.isBomb) {
                     continue;
                 }
 
