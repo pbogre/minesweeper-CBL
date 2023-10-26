@@ -286,7 +286,6 @@ public class Game extends JFrame{
         hintButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // toggle hint mode
                 self.toggleHintMode();
             }
         }); 
@@ -342,12 +341,8 @@ public class Game extends JFrame{
                                     clip.open(audioInputStream);
                                     clip.start();
 
-                                } catch (UnsupportedAudioFileException e) {
-                                    e.printStackTrace();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                } catch (LineUnavailableException e) {
-                                    e.printStackTrace();
+                                } catch (Exception e) {
+                                    System.out.println("Could not play audio file");
                                 }
 
                                 mainLabel.setText("x(");
