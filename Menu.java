@@ -12,6 +12,7 @@ public class Menu extends JFrame {
     public int selectedBombAmount;
     public int selectedMaxProbability;
 
+    public boolean displayMoreOptions;
     public boolean useProbability;
     public boolean drawProbabilities;
     public boolean drawPopulationRings;
@@ -83,6 +84,7 @@ public class Menu extends JFrame {
 
         this.selectedMaxProbability = 8;
 
+        this.displayMoreOptions = false;
         this.useProbability = true;
         this.drawProbabilities = false;
         this.drawPopulationRings = false;
@@ -98,8 +100,7 @@ public class Menu extends JFrame {
         this.selectDifficultyLabel = new JLabel("Select Difficulty (Medium)");
         this.selectDifficultyLabel.setFont(new Font("Arial", Font.ITALIC, 18));
 
-        JLabel optionsLabel = new JLabel("More Options");
-        optionsLabel.setFont(new Font("Arial", Font.ITALIC, 18));
+        JButton optionsButton = new JButton("More Options");
 
         JButton startGameButton = new JButton("Start Game");
         startGameButton.setFocusPainted(false);
@@ -181,18 +182,21 @@ public class Menu extends JFrame {
 
         constraints.gridx = 0;
         constraints.gridy = 8;
-        add(optionsLabel, constraints);
+        add(optionsButton, constraints);
 
         constraints.gridx = 0;
         constraints.gridy = 9;
+        useProbabilityToggle.setVisible(this.displayMoreOptions);
         add(useProbabilityToggle, constraints);
 
         constraints.gridx = 0;
         constraints.gridy = 10;
+        drawProbabilitiesToggle.setVisible(this.displayMoreOptions);
         add(drawProbabilitiesToggle, constraints);
 
         constraints.gridx = 0;
         constraints.gridy = 11;
+        drawPopulationRingsToggle.setVisible(this.displayMoreOptions);
         add(drawPopulationRingsToggle, constraints);
 
         constraints.gridx = 0;
@@ -201,10 +205,12 @@ public class Menu extends JFrame {
         maxProbabilitySlider.setMinorTickSpacing(5);
         maxProbabilitySlider.setPaintTicks(true);
         maxProbabilitySlider.setPaintLabels(true);
+        maxProbabilitySlider.setVisible(this.displayMoreOptions);
         add(maxProbabilitySlider, constraints);
 
         constraints.gridx = 0;
         constraints.gridy = 13;
+        maxProbabilityLabel.setVisible(this.displayMoreOptions);
         add(maxProbabilityLabel, constraints);
 
         this.setDifficulty(this.selectedGridSize, this.selectedBombAmount);
@@ -266,6 +272,19 @@ public class Menu extends JFrame {
             }
         });
 
+        optionsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                    self.displayMoreOptions = !self.displayMoreOptions;
+                    useProbabilityToggle.setVisible(self.displayMoreOptions);
+
+                    boolean displayCustomMoreOptions = self.displayMoreOptions && self.useProbability;
+                    drawProbabilitiesToggle.setVisible(displayCustomMoreOptions);
+                    drawPopulationRingsToggle.setVisible(displayCustomMoreOptions);
+                    maxProbabilitySlider.setVisible(displayCustomMoreOptions);
+                    maxProbabilityLabel.setVisible(displayCustomMoreOptions);
+                }
+        });
         useProbabilityToggle.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -316,7 +335,7 @@ public class Menu extends JFrame {
             @Override
             public void stateChanged(ChangeEvent e){
                 self.selectedMaxProbability = maxProbabilitySlider.getValue();
-                maxProbabilityLabel.setText("Max. Probability: " + self.selectedMaxProbability + "%");
+                maxProbabilityLabel.setText("Max. probability: " + self.selectedMaxProbability + "%");
             }
         });
     }
