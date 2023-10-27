@@ -140,20 +140,34 @@ public class Game extends JFrame{
         // located around the corners, whereas this way we 
         // dont get rid of most of the available bombs right 
         // away
+        int largestRing = 1 + this.gridSize - Math.min(this.firstCell.row, this.firstCell.col);
         ringloop:
-        for (int d = 0; d < this.gridSize / 2; d++) {
-            for (int y = this.firstCell.row - d; y < this.firstCell.row + d; y++) {
+        for (int d = 1; d <= largestRing; d++) {
+            for (int y = this.firstCell.row - d; y <= this.firstCell.row + d; y++) {
  
+                // skip if out of bounds
                 if (y < 0 || y >= this.gridSize) {
                     continue;
                 }
 
-                for (int x = this.firstCell.col - d; x < this.firstCell.col + d; x++) {
+                for (int x = this.firstCell.col - d; x <= this.firstCell.col + d; x++) {
+
+                    // skip if inside ring (dont want to iterate over previous ring)
+                    if (x > this.firstCell.col - d  && x < this.firstCell.col + d &&
+                        y > this.firstCell.row - d  && y < this.firstCell.row + d ) {
+                        continue;
+                    }
+
+                    // skip if out of bounds
                     if (x < 0 || x >= this.gridSize) {
                         continue;
                     }
 
                     Cell currentCell = this.cells[y][x];
+
+                    //currentCell.setBackground(d % 2 == 0 ? Color.WHITE : Color.BLACK);
+                    //currentCell.setForeground(d % 2 == 0 ? Color.BLACK : Color.WHITE);
+                    //currentCell.setText(String.valueOf(d));
 
                     double randomDouble = random.nextDouble(0, 1);
                     double probability = currentCell.calculateProbabilityOfBomb(this.firstCell.col, this.firstCell.row, this.gridSize);
@@ -170,6 +184,7 @@ public class Game extends JFrame{
             }
         }
 
+        // if we haven't finished populating, restart
         if (remainingBombs > 0) {
             this.populateBombsProbability(remainingBombs);
         }
@@ -208,11 +223,11 @@ public class Game extends JFrame{
                 }
 
                 double probability = currentCell.calculateProbabilityOfBomb(this.firstCell.col, this.firstCell.row, this.gridSize);
-                double intensity = Math.min(Math.log(1 / probability) * 20, 255);
+                double intensity = probability * 15 * 255;
 
-                // the brighter the color, the more likely it is to
-                // not have been selected as a bomb
                 currentCell.setBackground(new Color(0, 0, (int)(intensity)));
+                currentCell.setForeground(Color.YELLOW);
+                currentCell.setText((int)(probability * 100) + "%");
             }
         }
     }

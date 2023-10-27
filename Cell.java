@@ -82,6 +82,7 @@ public class Cell extends JButton {
 
         setBackground(Color.LIGHT_GRAY);
         setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+        setText("");
     }
 
     void toggleFlag() {
@@ -102,11 +103,12 @@ public class Cell extends JButton {
     }
 
     // explanation for the calculation of the probabilty of a cell 
-    // being a bomb can be found here: https://www.desmos.com/calculator/pc2irxrb6e
+    // being a bomb can be found here: https://www.desmos.com/calculator/vo8q8z5ecx
     double calculateProbabilityOfBomb(int x, int y, int gridSize) {
-        // we use the simple grid distance because it is computationally faster
+        // we use the simple grid distance because 
+        // it is computationally faster than pythagora
         double distance = Math.abs(y - this.row) + Math.abs(x - this.col);
-        double probability = (2 / Math.PI) * Math.atan((distance * distance) / Math.pow(gridSize, 3));
+        double probability = (2 / (15 * Math.PI)) * Math.atan((distance * distance) / gridSize);
 
         return probability;
     }
