@@ -18,10 +18,16 @@ class GameWonException extends Exception {
 }
 
 public class Game extends JFrame{
-    public boolean firstCellRevealed;
+    public Cell firstCell;
+
     public boolean gameOver;
     public boolean hintMode;
     public boolean autoSolve;
+
+    public int maxProbability;
+    public boolean drawProbabilities;
+    public boolean drawPopulationRings;
+
     public int gridSize;
     public int cellSize;
     public int bombAmount;
@@ -54,23 +60,14 @@ public class Game extends JFrame{
     public void updateHintMode() {
         this.hintMode = !this.hintMode;
 
-        if (!this.firstCellRevealed) {
+        if (this.firstCell == null) {
             return;
         }
 
         // if disabling hint mode, reset color of all cells unrevealed
         // also do this if gameover
         if(!this.hintMode || this.gameOver) {
-            for(int y = 0; y < this.gridSize; y++) {
-                for(int x = 0; x < this.gridSize; x++) {
-
-                    if (this.cells[y][x].isRevealed) {
-                        continue;
-                    }
-
-                    this.cells[y][x].setBackground(new Color(180, 180, 180));
-                }
-            }
+            this.resetCells();
 
             return;
         }
@@ -80,16 +77,43 @@ public class Game extends JFrame{
     }
 
     public void toggleAutoMode() {
-       this.autoSolve = !this.autoSolve;
-       System.out.println("Auto mode " + (this.autoSolve ? "ON" : "OFF"));
+        
+        this.autoSolve = !this.autoSolve;
+        System.out.println("Auto mode " + (this.autoSolve ? "ON" : "OFF"));
 
-       if(!this.autoSolve || !this.hintMode) {
+        if (!this.autoSolve || !this.hintMode) {
            return;
-       }
+        }
 
-       this.solveSituation();
+        this.solveSituation();
+    }
 
-       return;
+    public void resetCells() {
+
+        if (this.drawProbabilities) {
+            this.paintProbabilities();
+
+            return;
+        }
+
+        if (this.drawPopulationRings) {
+            this.paintPopulationRings();
+
+            return;
+        }
+
+        for(int y = 0; y < this.gridSize; y++) {
+            for(int x = 0; x < this.gridSize; x++) {
+                Cell currentCell = this.cells[y][x];
+
+                if (currentCell.isRevealed) {
+                    continue;
+                }
+
+                currentCell.setBackground(new Color(180, 180, 180));
+                currentCell.setText("");
+            }
+        }
     }
 
     public void revealBombs() {
@@ -108,7 +132,71 @@ public class Game extends JFrame{
         }
     }
 
-    public void populateBombs(Cell exceptionCell) {
+    // population of bombs is done based on a probability 
+    // distribution where the likeliness of a cell being a 
+    // bomb increases the further away it is from the first
+    // clicked cell. 
+    // this makes it more unlikely for the first clicked cell 
+    // to be surrounded by bombs and allows for a more fluent 
+    // user experience since it makes it less likely to have 
+    // to guess when beginning the game, which greatly influences
+    // whether or not you're going to have to guess later in the game.
+    public void populateBombsProbability(int remainingBombs) {
+        Random random = new Random();
+
+        // the loop increments in rings surrounding the 
+        // exception cell, because if we simply loop linearly
+        // through all cells then most of the bombs will be 
+        // located around the corners, whereas this way we 
+        // dont get rid of most of the available bombs right 
+        // away
+        int largestRing = 1 + this.gridSize - Math.min(this.firstCell.row, this.firstCell.col);
+        ringloop:
+        for (int d = 1; d <= largestRing; d++) {
+            for (int y = this.firstCell.row - d; y <= this.firstCell.row + d; y++) {
+ 
+                // skip if out of bounds
+                if (y < 0 || y >= this.gridSize) {
+                    continue;
+                }
+
+                for (int x = this.firstCell.col - d; x <= this.firstCell.col + d; x++) {
+
+                    // skip if inside ring (dont want to iterate over previous ring)
+                    if (x > this.firstCell.col - d  && x < this.firstCell.col + d &&
+                        y > this.firstCell.row - d  && y < this.firstCell.row + d ) {
+                        continue;
+                    }
+
+                    // skip if out of bounds
+                    if (x < 0 || x >= this.gridSize) {
+                        continue;
+                    }
+
+                    Cell currentCell = this.cells[y][x];
+
+                    double randomDouble = random.nextDouble(0, 1);
+                    double probability = currentCell.calculateProbabilityOfBomb(this.firstCell.col, this.firstCell.row, this.gridSize, this.maxProbability);
+
+                    if (randomDouble < probability) {
+                        currentCell.makeBomb();
+                        remainingBombs--;
+                    }
+                }
+
+                if (remainingBombs <= 0) {
+                    break ringloop;
+                }
+            }
+        }
+
+        // if we haven't finished populating, restart
+        if (remainingBombs > 0) {
+            this.populateBombsProbability(remainingBombs);
+        }
+    }
+
+    public void populateBombsRandom() {
         Random random = new Random();
         int remainingBombs = this.bombAmount;
 
@@ -122,12 +210,74 @@ public class Game extends JFrame{
                 continue;
             }
             // skip if is exception cell (first cell revealed)
-            if (randomCell.row == exceptionCell.row && randomCell.col == exceptionCell.col) {
+            if (randomCell.row == this.firstCell.row && randomCell.col == this.firstCell.col) {
                 continue;
             }
 
             randomCell.makeBomb();
             remainingBombs--;
+        }
+    }
+
+    public void paintProbabilities() {
+        for (int y = 0; y < this.gridSize; y++) {
+            for (int x = 0; x < this.gridSize; x++) {
+                Cell currentCell = this.cells[y][x];
+
+                if (currentCell.isRevealed) {
+                    continue;
+                }
+
+                double probability = currentCell.calculateProbabilityOfBomb(this.firstCell.col, this.firstCell.row, this.gridSize, this.maxProbability);
+                double intensity = probability * (100 / this.maxProbability) * 255;
+
+                currentCell.setBackground(new Color(0, 0, (int)(intensity)));
+                currentCell.setForeground(Color.YELLOW);
+                currentCell.setText((int)(probability * 100) + "%");
+            }
+        }
+    }
+
+    // this method serves as a demonstation
+    // that the way the iteration is done 
+    // in the probability population method 
+    // works as intended
+    public void paintPopulationRings() {
+        int largestRing = 1 + this.gridSize - Math.min(this.firstCell.row, this.firstCell.col);
+
+        for (int d = 1; d <= largestRing; d++) {
+            for (int y = this.firstCell.row - d; y <= this.firstCell.row + d; y++) {
+ 
+                // skip if out of bounds
+                if (y < 0 || y >= this.gridSize) {
+                    continue;
+                }
+
+                for (int x = this.firstCell.col - d; x <= this.firstCell.col + d; x++) {
+
+                    // skip if inside ring (dont want to iterate over previous ring)
+                    if (x > this.firstCell.col - d  && x < this.firstCell.col + d &&
+                        y > this.firstCell.row - d  && y < this.firstCell.row + d ) {
+                        continue;
+                    }
+
+                    // skip if out of bounds
+                    if (x < 0 || x >= this.gridSize) {
+                        continue;
+                    }
+
+                    Cell currentCell = this.cells[y][x];
+
+                    // skip if revealed
+                    if (currentCell.isRevealed) {
+                        continue;
+                    }
+
+                    currentCell.setBackground(d % 2 == 0 ? Color.WHITE : Color.BLACK);
+                    currentCell.setForeground(d % 2 == 0 ? Color.BLACK : Color.WHITE);
+                    currentCell.setText(String.valueOf(d));
+                }
+            }
         }
     }
 
@@ -254,11 +404,18 @@ public class Game extends JFrame{
         this.mainLabel.setText("B)");
     }
 
-    public Game(int gridSize, int bombAmount){
-        this.firstCellRevealed = false;
+    public Game(int gridSize, int bombAmount, int maxProbability, 
+                boolean useProbability, boolean drawProbabilities, boolean drawPopulationRings){
+        this.firstCell = null;
+
         this.gameOver = false;
         this.hintMode = false;
         this.autoSolve = false;
+
+        this.drawProbabilities = drawProbabilities;
+        this.drawPopulationRings = drawPopulationRings;
+        this.maxProbability = maxProbability;
+
         this.cellSize = 35;
         this.gridSize = gridSize;
         this.bombAmount = bombAmount;
@@ -397,10 +554,23 @@ public class Game extends JFrame{
                                 return;
                             }
 
-                            if(!firstCellRevealed) {
-                                self.populateBombs(currentCell);
+                            if(firstCell == null) {
+                                self.firstCell = currentCell;
+
+                                if (useProbability) {
+                                    self.populateBombsProbability(self.bombAmount);
+                                } else {
+                                    self.populateBombsRandom();
+                                }
+
                                 self.timer.start();
-                                firstCellRevealed = true;
+
+                                if (self.drawProbabilities) {
+                                    self.paintProbabilities();
+                                }
+                                if (self.drawPopulationRings) {
+                                    self.paintPopulationRings();
+                                }
                             }
 
                             try {

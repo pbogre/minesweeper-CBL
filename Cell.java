@@ -1,5 +1,4 @@
 import javax.swing.*;
-import javax.swing.plaf.ColorUIResource;
 
 import java.awt.*;
 
@@ -14,14 +13,17 @@ public class Cell extends JButton {
     public boolean isRevealed;
 
     void markUnknown() {
+        this.setForeground(Color.BLACK);
         this.setBackground(Color.YELLOW);
     }
 
     void markSafe() {
+        this.setForeground(Color.BLACK);
         this.setBackground(Color.GREEN);
     }
 
     void markBomb() {
+        this.setForeground(Color.BLACK);
         this.setBackground(Color.RED);
     }
 
@@ -83,6 +85,7 @@ public class Cell extends JButton {
 
         setBackground(Color.LIGHT_GRAY);
         setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+        setText("");
     }
 
     void toggleFlag() {
@@ -100,6 +103,17 @@ public class Cell extends JButton {
             this.isFlagged = false;
             setIcon(null);
         }
+    }
+
+    // explanation for the calculation of the probabilty of a cell 
+    // being a bomb can be found here: https://www.desmos.com/calculator/b3lcshvkvg
+    double calculateProbabilityOfBomb(int x, int y, int gridSize, int maxProbability) {
+        // we use the simple grid distance because 
+        // it is computationally faster than pythagora
+        double distance = Math.abs(y - this.row) + Math.abs(x - this.col);
+        double probability = (maxProbability / 100.0) * (2 / Math.PI) * Math.atan((distance * distance) / gridSize);
+
+        return probability;
     }
 
     Cell(int row, int col) {
