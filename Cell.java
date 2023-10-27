@@ -13,14 +13,17 @@ public class Cell extends JButton {
     public boolean isRevealed;
 
     void markUnknown() {
+        this.setForeground(Color.BLACK);
         this.setBackground(Color.YELLOW);
     }
 
     void markSafe() {
+        this.setForeground(Color.BLACK);
         this.setBackground(Color.GREEN);
     }
 
     void markBomb() {
+        this.setForeground(Color.BLACK);
         this.setBackground(Color.RED);
     }
 
