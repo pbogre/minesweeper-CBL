@@ -11,6 +11,9 @@ public class Menu extends JFrame {
     public int selectedGridSize;
     public int selectedBombAmount;
 
+    public boolean useProbability;
+    public boolean drawProbabilities;
+
     private JLabel selectDifficultyLabel;
 
     private JSlider gridSizeSlider;
@@ -72,9 +75,13 @@ public class Menu extends JFrame {
         }
 
         this.windowSize = windowSize;
+        this.setMinimumSize(new Dimension(600, 600));
         // default grid size & bomb amount (medium difficulty)
         this.selectedGridSize = 20;
         this.selectedBombAmount = 60;
+
+        this.useProbability = true;
+        this.drawProbabilities = false;
 
         setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
@@ -86,6 +93,9 @@ public class Menu extends JFrame {
 
         this.selectDifficultyLabel = new JLabel("Select Difficulty (Medium)");
         this.selectDifficultyLabel.setFont(new Font("Arial", Font.ITALIC, 18));
+
+        JLabel optionsLabel = new JLabel("More Options");
+        optionsLabel.setFont(new Font("Arial", Font.ITALIC, 18));
 
         JButton startGameButton = new JButton("Start Game");
         startGameButton.setFocusPainted(false);
@@ -101,6 +111,9 @@ public class Menu extends JFrame {
 
         JButton customDifficultyButton = new JButton("Custom");
         customDifficultyButton.setFocusPainted(false);
+
+        JCheckBox useProbabilityToggle = new JCheckBox("Use probability-based bomb population?", this.useProbability);
+        JCheckBox drawProbabilitiesToggle = new JCheckBox("Draw probability of cell being picked as bomb?", this.drawProbabilities);
 
         JPanel difficultyPanel = new JPanel();
 
@@ -158,6 +171,18 @@ public class Menu extends JFrame {
         bombAmountLabel.setVisible(false);
         add(bombAmountLabel, constraints);
 
+        constraints.gridx = 0;
+        constraints.gridy = 8;
+        add(optionsLabel, constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 9;
+        add(useProbabilityToggle, constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 10;
+        add(drawProbabilitiesToggle, constraints);
+
         this.setDifficulty(this.selectedGridSize, this.selectedBombAmount);
 
         Menu self = this;
@@ -165,7 +190,7 @@ public class Menu extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                     // Start game and stop menu
-                    Game game = new Game(self.selectedGridSize, self.selectedBombAmount);
+                    Game game = new Game(self.selectedGridSize, self.selectedBombAmount, self.useProbability, self.drawProbabilities);
                     game.run();
                     self.stop();
                 }
@@ -214,5 +239,28 @@ public class Menu extends JFrame {
                 self.updateCustomDifficulty();
             }
         });
+
+        useProbabilityToggle.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                boolean selected = (e.getStateChange() == 1);
+
+                self.useProbability = selected;
+                drawProbabilitiesToggle.setVisible(selected);
+
+                if (!self.useProbability) {
+                    self.drawProbabilities = false;
+                }
+            }
+        });
+        drawProbabilitiesToggle.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                boolean selected = (e.getStateChange() == 1);
+
+                self.drawProbabilities = selected;
+            }
+        });
+            
     }
 }

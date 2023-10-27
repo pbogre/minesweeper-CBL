@@ -18,10 +18,13 @@ class GameWonException extends Exception {
 }
 
 public class Game extends JFrame{
-    public boolean firstCellRevealed;
+    public Cell firstCell;
+
     public boolean gameOver;
     public boolean hintMode;
     public boolean autoSolve;
+    public boolean drawProbabilities;
+
     public int gridSize;
     public int cellSize;
     public int bombAmount;
@@ -54,23 +57,14 @@ public class Game extends JFrame{
     public void updateHintMode() {
         this.hintMode = !this.hintMode;
 
-        if (!this.firstCellRevealed) {
+        if (this.firstCell == null) {
             return;
         }
 
         // if disabling hint mode, reset color of all cells unrevealed
         // also do this if gameover
         if(!this.hintMode || this.gameOver) {
-            for(int y = 0; y < this.gridSize; y++) {
-                for(int x = 0; x < this.gridSize; x++) {
-
-                    if (this.cells[y][x].isRevealed) {
-                        continue;
-                    }
-
-                    this.cells[y][x].setBackground(new Color(180, 180, 180));
-                }
-            }
+            this.resetCellsColor();
 
             return;
         }
@@ -80,16 +74,36 @@ public class Game extends JFrame{
     }
 
     public void toggleAutoMode() {
-       this.autoSolve = !this.autoSolve;
-       System.out.println("Auto mode " + (this.autoSolve ? "ON" : "OFF"));
+        
+        this.autoSolve = !this.autoSolve;
+        System.out.println("Auto mode " + (this.autoSolve ? "ON" : "OFF"));
 
-       if(!this.autoSolve || !this.hintMode) {
+        if (!this.autoSolve || !this.hintMode) {
            return;
-       }
+        }
 
-       this.solveSituation();
+        this.solveSituation();
+    }
 
-       return;
+    public void resetCellsColor() {
+
+        if (this.drawProbabilities) {
+            this.paintProbabilities();
+
+            return;
+        }
+
+        for(int y = 0; y < this.gridSize; y++) {
+            for(int x = 0; x < this.gridSize; x++) {
+                Cell currentCell = this.cells[y][x];
+
+                if (currentCell.isRevealed) {
+                    continue;
+                }
+
+                currentCell.setBackground(new Color(180, 180, 180));
+            }
+        }
     }
 
     public void revealBombs() {
@@ -117,24 +131,24 @@ public class Game extends JFrame{
     // user experience since it makes it less likely to have 
     // to guess when beginning the game, which greatly influences
     // whether or not you're going to have to guess later in the game.
-    public void populateBombs(Cell exceptionCell, int remainingBombs) {
+    public void populateBombsProbability(int remainingBombs) {
         Random random = new Random();
 
         // the loop increments in rings surrounding the 
         // exception cell, because if we simply loop linearly
-        // through all cells than most of the bombs will be 
+        // through all cells then most of the bombs will be 
         // located around the corners, whereas this way we 
         // dont get rid of most of the available bombs right 
-        // away at the cost of an extra indentation.
+        // away
         ringloop:
         for (int d = 0; d < this.gridSize / 2; d++) {
-            for (int y = exceptionCell.row - d; y < exceptionCell.row + d; y++) {
-                
+            for (int y = this.firstCell.row - d; y < this.firstCell.row + d; y++) {
+ 
                 if (y < 0 || y >= this.gridSize) {
                     continue;
                 }
 
-                for (int x = exceptionCell.col - d; x < exceptionCell.col + d; x++) {
+                for (int x = this.firstCell.col - d; x < this.firstCell.col + d; x++) {
                     if (x < 0 || x >= this.gridSize) {
                         continue;
                     }
@@ -142,7 +156,7 @@ public class Game extends JFrame{
                     Cell currentCell = this.cells[y][x];
 
                     double randomDouble = random.nextDouble(0, 1);
-                    double probability = currentCell.calculateProbabilityOfBomb(exceptionCell.col, exceptionCell.row, this.gridSize);
+                    double probability = currentCell.calculateProbabilityOfBomb(this.firstCell.col, this.firstCell.row, this.gridSize);
 
                     if (randomDouble < probability) {
                         currentCell.makeBomb();
@@ -157,16 +171,43 @@ public class Game extends JFrame{
         }
 
         if (remainingBombs > 0) {
-            this.populateBombs(exceptionCell, remainingBombs);
+            this.populateBombsProbability(remainingBombs);
         }
     }
 
-    public void paintProbability(Cell exceptionCell) {
+    public void populateBombsRandom() {
+        Random random = new Random();
+        int remainingBombs = this.bombAmount;
+
+        while (remainingBombs > 0) {
+            int randomColumn = random.nextInt(this.gridSize);
+            int randomRow = random.nextInt(this.gridSize);
+            Cell randomCell = this.cells[randomRow][randomColumn];
+           
+            // skip if already bomb
+            if (randomCell.isBomb) {
+                continue;
+            }
+            // skip if is exception cell (first cell revealed)
+            if (randomCell.row == this.firstCell.row && randomCell.col == this.firstCell.col) {
+                continue;
+            }
+
+            randomCell.makeBomb();
+            remainingBombs--;
+        }
+    }
+
+    public void paintProbabilities() {
         for (int y = 0; y < this.gridSize; y++) {
             for (int x = 0; x < this.gridSize; x++) {
                 Cell currentCell = this.cells[y][x];
 
-                double probability = currentCell.calculateProbabilityOfBomb(exceptionCell.col, exceptionCell.row, this.gridSize);
+                if (currentCell.isRevealed) {
+                    continue;
+                }
+
+                double probability = currentCell.calculateProbabilityOfBomb(this.firstCell.col, this.firstCell.row, this.gridSize);
                 double intensity = Math.min(Math.log(1 / probability) * 20, 255);
 
                 // the brighter the color, the more likely it is to
@@ -299,11 +340,14 @@ public class Game extends JFrame{
         this.mainLabel.setText("B)");
     }
 
-    public Game(int gridSize, int bombAmount){
-        this.firstCellRevealed = false;
+    public Game(int gridSize, int bombAmount, boolean useProbability, boolean drawProbabilities){
+        this.firstCell = null;
+
         this.gameOver = false;
         this.hintMode = false;
         this.autoSolve = false;
+        this.drawProbabilities = drawProbabilities;
+
         this.cellSize = 35;
         this.gridSize = gridSize;
         this.bombAmount = bombAmount;
@@ -442,12 +486,20 @@ public class Game extends JFrame{
                                 return;
                             }
 
-                            if(!firstCellRevealed) {
-                                self.populateBombs(currentCell, self.bombAmount);
-                                self.timer.start();
-                                firstCellRevealed = true;
+                            if(firstCell == null) {
+                                self.firstCell = currentCell;
 
-                                self.paintProbability(currentCell);;
+                                if (useProbability) {
+                                    self.populateBombsProbability(self.bombAmount);
+                                } else {
+                                    self.populateBombsRandom();
+                                }
+
+                                self.timer.start();
+
+                                if (self.drawProbabilities) {
+                                    self.paintProbabilities();
+                                }
                             }
 
                             try {
