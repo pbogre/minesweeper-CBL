@@ -68,8 +68,8 @@ public class Game extends JFrame{
     }
 
     /**
-     * The function toggles the hint mode and updates the color of cells based on whether hint mode is
-     * enabled or disabled.
+     * The function `updateHintMode` toggles the hint mode and updates the display of hints based on
+     * the current game situation.
      */
     public void updateHintMode() {
         this.hintMode = !this.hintMode;
@@ -105,6 +105,10 @@ public class Game extends JFrame{
         this.solveSituation();
     }
 
+    /**
+     * The function resets the cells in a grid by changing their background color and removing any
+     * text.
+     */
     public void resetCells() {
 
         if (this.drawProbabilities) {
@@ -133,6 +137,9 @@ public class Game extends JFrame{
         }
     }
 
+    /**
+     * The function reveals all the bombs on the grid and highlights any incorrectly flagged cells.
+     */
     public void revealBombs() {
         for(int y = 0; y < this.gridSize; y++) {
             for(int x = 0; x < this.gridSize; x++) {
@@ -150,21 +157,14 @@ public class Game extends JFrame{
     }
 
     /**
-     * The function populates the game grid with a specified number of bombs, excluding a specified
-     * exception cell.
+     * The function populates the grid with bombs based on their probability of being a bomb, which is a
+     * distribution where the chance of a cell being a bomb increases the further away it is from the 
+     * first clicked cell. This makes it more unlikely for the first clicked cell to be surrounded by 
+     * bombs and allows for a more fluent user experience since it makes it less likely to have to guess.
      * 
-     * @param exceptionCell The exceptionCell parameter is a Cell object that represents the first cell
-     * that has been revealed. This cell is excluded from being populated with a bomb.
+     * @param remainingBombs The remainingBombs parameter represents the number of bombs that still
+     * need to be placed on the grid.
      */
-    // population of bombs is done based on a probability 
-    // distribution where the likeliness of a cell being a 
-    // bomb increases the further away it is from the first
-    // clicked cell. 
-    // this makes it more unlikely for the first clicked cell 
-    // to be surrounded by bombs and allows for a more fluent 
-    // user experience since it makes it less likely to have 
-    // to guess when beginning the game, which greatly influences
-    // whether or not you're going to have to guess later in the game.
     public void populateBombsProbability(int remainingBombs) {
         Random random = new Random();
 
@@ -220,6 +220,9 @@ public class Game extends JFrame{
         }
     }
 
+    /**
+     * The function populates a grid with a random number of bombs, excluding the first revealed cell.
+     */
     public void populateBombsRandom() {
         Random random = new Random();
         int remainingBombs = this.bombAmount;
@@ -244,12 +247,7 @@ public class Game extends JFrame{
     }
 
     /**
-     * The function computes the number of neighboring bombs for a given cell in a Minesweeper game and
-     * recursively reveals its neighbors if there are no adjacent bombs. So every totally empty cell with no neighboring bombs
-     * is revealed and the cells with neighboring bombs are updated with the number of neighboring bombs.
-     * 
-     * @param cell The parameter "cell" is an object of the class "Cell". It represents a single cell
-     * in a grid.
+     * The function paints the probability of a cell being a bomb on the grid with the implemented distribution
      */
     public void paintProbabilities() {
         for (int y = 0; y < this.gridSize; y++) {
@@ -274,6 +272,11 @@ public class Game extends JFrame{
     // that the way the iteration is done 
     // in the probability population method 
     // works as intended
+    /**
+     * The function "paintPopulationRings" iterates over cells in a grid and sets their background
+     * color, foreground color, and text based on their distance from a specified cell in concetric rings
+     * to ensure bombs aren't focused in the corners of the grid.
+     */
     public void paintPopulationRings() {
         int largestRing = 1 + this.gridSize - Math.min(this.firstCell.row, this.firstCell.col);
 
@@ -313,6 +316,14 @@ public class Game extends JFrame{
         }
     }
 
+    /**
+     * The function computes the number of neighboring bombs for a given cell in a Minesweeper game and
+     * recursively reveals its neighbors if there are no adjacent bombs.
+     * 
+     * @param cell The parameter "cell" represents a specific cell in the grid. It is an instance of the
+     * "Cell" class, which has properties such as "row" and "col" to represent its position in
+     * the grid, as well as boolean properties like "isRevealed", "isFlag" and "isBomb".
+     */
     public void computeNeighboringBombs(Cell cell) throws GameWonException {
 
         cell.reveal();

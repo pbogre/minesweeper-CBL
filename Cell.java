@@ -132,10 +132,20 @@ public class Cell extends JButton {
     }
 
     
-    // The `Cell(int row, int col)` constructor is initializing a new instance of the `Cell` class with
-    // the given `row` and `col` parameters.
-    // explanation for the calculation of the probabilty of a cell 
-    // being a bomb can be found here: https://www.desmos.com/calculator/b3lcshvkvg
+    /**
+     * The function calculates the probability of a bomb being present at a given position in a grid
+     * based on the distance from the current position and the size of the grid. Explanation of the probability
+     * of a bomb: https://www.desmos.com/calculator/b3lcshvkvg
+     * 
+     * @param x The x-coordinate of the cell for which we want to calculate the probability of a bomb.
+     * @param y The y-coordinate of the current position on the grid.
+     * @param gridSize The gridSize parameter represents the size of the grid. It is used in the
+     * calculation of the probability of a bomb being present at a certain location.
+     * @param maxProbability The maximum probability of a bomb being present in the grid. It is given
+     * as a percentage, so it should be a value between 0 and 100.
+     * @return The method is returning the probability of a bomb being present at a given position on a
+     * grid.
+     */
     double calculateProbabilityOfBomb(int x, int y, int gridSize, int maxProbability) {
         // we use the simple grid distance because 
         // it is computationally faster than pythagora
