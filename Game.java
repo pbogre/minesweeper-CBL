@@ -108,26 +108,71 @@ public class Game extends JFrame{
         }
     }
 
-    public void populateBombs(Cell exceptionCell) {
+    // population of bombs is done based on a probability 
+    // distribution where the likeliness of a cell being a 
+    // bomb increases the further away it is from the first
+    // clicked cell. 
+    // this makes it more unlikely for the first clicked cell 
+    // to be surrounded by bombs and allows for a more fluent 
+    // user experience since it makes it less likely to have 
+    // to guess when beginning the game, which greatly influences
+    // whether or not you're going to have to guess later in the game.
+    public void populateBombs(Cell exceptionCell, int remainingBombs) {
         Random random = new Random();
-        int remainingBombs = this.bombAmount;
 
-        while (remainingBombs > 0) {
-            int randomColumn = random.nextInt(this.gridSize);
-            int randomRow = random.nextInt(this.gridSize);
-            Cell randomCell = this.cells[randomRow][randomColumn];
-           
-            // skip if already bomb
-            if (randomCell.isBomb) {
-                continue;
-            }
-            // skip if is exception cell (first cell revealed)
-            if (randomCell.row == exceptionCell.row && randomCell.col == exceptionCell.col) {
-                continue;
-            }
+        // the loop increments in rings surrounding the 
+        // exception cell, because if we simply loop linearly
+        // through all cells than most of the bombs will be 
+        // located around the corners, whereas this way we 
+        // dont get rid of most of the available bombs right 
+        // away at the cost of an extra indentation.
+        ringloop:
+        for (int d = 0; d < this.gridSize / 2; d++) {
+            for (int y = exceptionCell.row - d; y < exceptionCell.row + d; y++) {
+                
+                if (y < 0 || y >= this.gridSize) {
+                    continue;
+                }
 
-            randomCell.makeBomb();
-            remainingBombs--;
+                for (int x = exceptionCell.col - d; x < exceptionCell.col + d; x++) {
+                    if (x < 0 || x >= this.gridSize) {
+                        continue;
+                    }
+
+                    Cell currentCell = this.cells[y][x];
+
+                    double randomDouble = random.nextDouble(0, 1);
+                    double probability = currentCell.calculateProbabilityOfBomb(exceptionCell.col, exceptionCell.row, this.gridSize);
+
+                    if (randomDouble < probability) {
+                        currentCell.makeBomb();
+                        remainingBombs--;
+                    }
+                }
+
+                if (remainingBombs <= 0) {
+                    break ringloop;
+                }
+            }
+        }
+
+        if (remainingBombs > 0) {
+            this.populateBombs(exceptionCell, remainingBombs);
+        }
+    }
+
+    public void paintProbability(Cell exceptionCell) {
+        for (int y = 0; y < this.gridSize; y++) {
+            for (int x = 0; x < this.gridSize; x++) {
+                Cell currentCell = this.cells[y][x];
+
+                double probability = currentCell.calculateProbabilityOfBomb(exceptionCell.col, exceptionCell.row, this.gridSize);
+                double intensity = Math.min(Math.log(1 / probability) * 20, 255);
+
+                // the brighter the color, the more likely it is to
+                // not have been selected as a bomb
+                currentCell.setBackground(new Color(0, 0, (int)(intensity)));
+            }
         }
     }
 
@@ -398,9 +443,11 @@ public class Game extends JFrame{
                             }
 
                             if(!firstCellRevealed) {
-                                self.populateBombs(currentCell);
+                                self.populateBombs(currentCell, self.bombAmount);
                                 self.timer.start();
                                 firstCellRevealed = true;
+
+                                self.paintProbability(currentCell);;
                             }
 
                             try {

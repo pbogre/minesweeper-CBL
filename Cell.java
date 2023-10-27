@@ -1,5 +1,4 @@
 import javax.swing.*;
-import javax.swing.plaf.ColorUIResource;
 
 import java.awt.*;
 
@@ -100,6 +99,16 @@ public class Cell extends JButton {
             this.isFlagged = false;
             setIcon(null);
         }
+    }
+
+    // explanation for the calculation of the probabilty of a cell 
+    // being a bomb can be found here: https://www.desmos.com/calculator/pc2irxrb6e
+    double calculateProbabilityOfBomb(int x, int y, int gridSize) {
+        // we use the simple grid distance because it is computationally faster
+        double distance = Math.abs(y - this.row) + Math.abs(x - this.col);
+        double probability = (2 / Math.PI) * Math.atan((distance * distance) / Math.pow(gridSize, 3));
+
+        return probability;
     }
 
     Cell(int row, int col) {
