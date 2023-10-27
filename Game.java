@@ -18,9 +18,16 @@ class GameWonException extends Exception {
 }
 
 public class Game extends JFrame{
-    public boolean firstCellRevealed;
+    public Cell firstCell;
+
     public boolean gameOver;
     public boolean hintMode;
+    public boolean autoSolve;
+
+    public int maxProbability;
+    public boolean drawProbabilities;
+    public boolean drawPopulationRings;
+
     public int gridSize;
     public int cellSize;
     public int bombAmount;
@@ -30,10 +37,12 @@ public class Game extends JFrame{
     public Solver solver;
 
     public Timer timer;
+    public JLabel mainLabel;
     public long time;
     public int remainingBombsCount;
 
     private ImageIcon gameIcon;
+
 
 
     /**
@@ -62,26 +71,17 @@ public class Game extends JFrame{
      * The function toggles the hint mode and updates the color of cells based on whether hint mode is
      * enabled or disabled.
      */
-    public void toggleHintMode() {
+    public void updateHintMode() {
         this.hintMode = !this.hintMode;
 
-        if (!this.firstCellRevealed) {
+        if (this.firstCell == null) {
             return;
         }
 
         // if disabling hint mode, reset color of all cells unrevealed
         // also do this if gameover
         if(!this.hintMode || this.gameOver) {
-            for(int y = 0; y < this.gridSize; y++) {
-                for(int x = 0; x < this.gridSize; x++) {
-
-                    if (this.cells[y][x].isRevealed) {
-                        continue;
-                    }
-
-                    this.cells[y][x].setBackground(new Color(180, 180, 180));
-                }
-            }
+            this.resetCells();
 
             return;
         }
@@ -93,6 +93,46 @@ public class Game extends JFrame{
     /**
      * The function reveals all the bombs on the grid and highlights any incorrectly flagged cells.
      */
+    public void toggleAutoMode() {
+        
+        this.autoSolve = !this.autoSolve;
+        System.out.println("Auto mode " + (this.autoSolve ? "ON" : "OFF"));
+
+        if (!this.autoSolve || !this.hintMode) {
+           return;
+        }
+
+        this.solveSituation();
+    }
+
+    public void resetCells() {
+
+        if (this.drawProbabilities) {
+            this.paintProbabilities();
+
+            return;
+        }
+
+        if (this.drawPopulationRings) {
+            this.paintPopulationRings();
+
+            return;
+        }
+
+        for(int y = 0; y < this.gridSize; y++) {
+            for(int x = 0; x < this.gridSize; x++) {
+                Cell currentCell = this.cells[y][x];
+
+                if (currentCell.isRevealed) {
+                    continue;
+                }
+
+                currentCell.setBackground(new Color(180, 180, 180));
+                currentCell.setText("");
+            }
+        }
+    }
+
     public void revealBombs() {
         for(int y = 0; y < this.gridSize; y++) {
             for(int x = 0; x < this.gridSize; x++) {
@@ -116,7 +156,71 @@ public class Game extends JFrame{
      * @param exceptionCell The exceptionCell parameter is a Cell object that represents the first cell
      * that has been revealed. This cell is excluded from being populated with a bomb.
      */
-    public void populateBombs(Cell exceptionCell) {
+    // population of bombs is done based on a probability 
+    // distribution where the likeliness of a cell being a 
+    // bomb increases the further away it is from the first
+    // clicked cell. 
+    // this makes it more unlikely for the first clicked cell 
+    // to be surrounded by bombs and allows for a more fluent 
+    // user experience since it makes it less likely to have 
+    // to guess when beginning the game, which greatly influences
+    // whether or not you're going to have to guess later in the game.
+    public void populateBombsProbability(int remainingBombs) {
+        Random random = new Random();
+
+        // the loop increments in rings surrounding the 
+        // exception cell, because if we simply loop linearly
+        // through all cells then most of the bombs will be 
+        // located around the corners, whereas this way we 
+        // dont get rid of most of the available bombs right 
+        // away
+        int largestRing = 1 + this.gridSize - Math.min(this.firstCell.row, this.firstCell.col);
+        ringloop:
+        for (int d = 1; d <= largestRing; d++) {
+            for (int y = this.firstCell.row - d; y <= this.firstCell.row + d; y++) {
+ 
+                // skip if out of bounds
+                if (y < 0 || y >= this.gridSize) {
+                    continue;
+                }
+
+                for (int x = this.firstCell.col - d; x <= this.firstCell.col + d; x++) {
+
+                    // skip if inside ring (dont want to iterate over previous ring)
+                    if (x > this.firstCell.col - d  && x < this.firstCell.col + d &&
+                        y > this.firstCell.row - d  && y < this.firstCell.row + d ) {
+                        continue;
+                    }
+
+                    // skip if out of bounds
+                    if (x < 0 || x >= this.gridSize) {
+                        continue;
+                    }
+
+                    Cell currentCell = this.cells[y][x];
+
+                    double randomDouble = random.nextDouble(0, 1);
+                    double probability = currentCell.calculateProbabilityOfBomb(this.firstCell.col, this.firstCell.row, this.gridSize, this.maxProbability);
+
+                    if (randomDouble < probability) {
+                        currentCell.makeBomb();
+                        remainingBombs--;
+                    }
+                }
+
+                if (remainingBombs <= 0) {
+                    break ringloop;
+                }
+            }
+        }
+
+        // if we haven't finished populating, restart
+        if (remainingBombs > 0) {
+            this.populateBombsProbability(remainingBombs);
+        }
+    }
+
+    public void populateBombsRandom() {
         Random random = new Random();
         int remainingBombs = this.bombAmount;
 
@@ -130,7 +234,7 @@ public class Game extends JFrame{
                 continue;
             }
             // skip if is exception cell (first cell revealed)
-            if (randomCell.row == exceptionCell.row && randomCell.col == exceptionCell.col) {
+            if (randomCell.row == this.firstCell.row && randomCell.col == this.firstCell.col) {
                 continue;
             }
 
@@ -147,15 +251,72 @@ public class Game extends JFrame{
      * @param cell The parameter "cell" is an object of the class "Cell". It represents a single cell
      * in a grid.
      */
+    public void paintProbabilities() {
+        for (int y = 0; y < this.gridSize; y++) {
+            for (int x = 0; x < this.gridSize; x++) {
+                Cell currentCell = this.cells[y][x];
+
+                if (currentCell.isRevealed) {
+                    continue;
+                }
+
+                double probability = currentCell.calculateProbabilityOfBomb(this.firstCell.col, this.firstCell.row, this.gridSize, this.maxProbability);
+                double intensity = probability * (100 / this.maxProbability) * 255;
+
+                currentCell.setBackground(new Color(0, 0, (int)(intensity)));
+                currentCell.setForeground(Color.YELLOW);
+                currentCell.setText((int)(probability * 100) + "%");
+            }
+        }
+    }
+
+    // this method serves as a demonstation
+    // that the way the iteration is done 
+    // in the probability population method 
+    // works as intended
+    public void paintPopulationRings() {
+        int largestRing = 1 + this.gridSize - Math.min(this.firstCell.row, this.firstCell.col);
+
+        for (int d = 1; d <= largestRing; d++) {
+            for (int y = this.firstCell.row - d; y <= this.firstCell.row + d; y++) {
+ 
+                // skip if out of bounds
+                if (y < 0 || y >= this.gridSize) {
+                    continue;
+                }
+
+                for (int x = this.firstCell.col - d; x <= this.firstCell.col + d; x++) {
+
+                    // skip if inside ring (dont want to iterate over previous ring)
+                    if (x > this.firstCell.col - d  && x < this.firstCell.col + d &&
+                        y > this.firstCell.row - d  && y < this.firstCell.row + d ) {
+                        continue;
+                    }
+
+                    // skip if out of bounds
+                    if (x < 0 || x >= this.gridSize) {
+                        continue;
+                    }
+
+                    Cell currentCell = this.cells[y][x];
+
+                    // skip if revealed
+                    if (currentCell.isRevealed) {
+                        continue;
+                    }
+
+                    currentCell.setBackground(d % 2 == 0 ? Color.WHITE : Color.BLACK);
+                    currentCell.setForeground(d % 2 == 0 ? Color.BLACK : Color.WHITE);
+                    currentCell.setText(String.valueOf(d));
+                }
+            }
+        }
+    }
+
     public void computeNeighboringBombs(Cell cell) throws GameWonException {
 
         cell.reveal();
         this.revealedCount++;
-
-        if (this.gridSize * this.gridSize - this.revealedCount == this.bombAmount) {
-            throw new GameWonException();
-        }
-
         this.solver.reveal(cell);
 
         int neighboringBombs = 0;
@@ -207,6 +368,13 @@ public class Game extends JFrame{
                 computeNeighboringBombs(currentCell);
             }
         }
+
+        // throw GameWonException at the end so that
+        // the neighboringBombs count is set also for the 
+        // final cells
+        if (this.gridSize * this.gridSize - this.revealedCount == this.bombAmount) {
+            throw new GameWonException();
+        }
     }
 
     /**
@@ -214,33 +382,42 @@ public class Game extends JFrame{
      * unknown based on the solver's output.
      */
     void solveSituation() {
-
         try {
-            ArrayList<ArrayList<Cell>> solvedSituation = solver.solveSituation();
+            ArrayList<ArrayList<Cell>> solvedSituation = this.solver.solveSituation();
 
-            for(Cell safe : solvedSituation.get(0)) {
-                if(!this.cells[safe.row][safe.col].isRevealed) {
+            for (Cell safe : solvedSituation.get(0)) {
+                if (!this.cells[safe.row][safe.col].isRevealed) {
                     safe.markSafe();
 
-                    // uncomment stuff below for recursive solver 
-                    // i.e., automatically win games if possible
-                    //try {
-                    //    this.computeNeighboringBombs(this.cells[safe.row][safe.col]);
-                    //}
-                    //catch (GameWonException e) {
-                    //    System.out.println(e.getMessage());
-                    //    this.gameOver = true;
-                    //}
+                    if (!this.autoSolve) {
+                        continue;
+                    }
 
-                    //this.solveSituation();
+                    try {
+                        this.computeNeighboringBombs(this.cells[safe.row][safe.col]);
+                    }
+                    catch (GameWonException e) {
+                        this.handleGameWon();
+                        System.out.println(e.getMessage());
+
+                        return;
+                    }
                 }
             }
+     
+            if (this.autoSolve){
+                this.solveSituation();
+            }
 
-            for(Cell bomb : solvedSituation.get(1)) {
+            if (this.gameOver) {
+                return;
+            }
+
+            for (Cell bomb : solvedSituation.get(1)) {
                 bomb.markBomb();
             }
 
-            for(Cell unknown : solvedSituation.get(2)) {
+            for (Cell unknown : solvedSituation.get(2)) {
                 unknown.markUnknown();
             }
         }
@@ -253,18 +430,30 @@ public class Game extends JFrame{
 
             return;
         }
-        // TODO handle the exception that happens on guess required sometimes
-        catch (Exception e) {
-            System.out.println("AN EXCEPTION OCCURED");
-        }
     }
 
     // The above code is defining a constructor for a Game class in Java. The constructor takes in two
     // parameters: gridSize and bombAmount.
-    public Game(int gridSize, int bombAmount){
-        this.firstCellRevealed = false;
+    void handleGameWon() {
+        this.gameOver = true;
+        this.updateHintMode();
+        this.timer.stop();
+
+        this.mainLabel.setText("B)");
+    }
+
+    public Game(int gridSize, int bombAmount, int maxProbability, 
+                boolean useProbability, boolean drawProbabilities, boolean drawPopulationRings){
+        this.firstCell = null;
+
         this.gameOver = false;
         this.hintMode = false;
+        this.autoSolve = false;
+
+        this.drawProbabilities = drawProbabilities;
+        this.drawPopulationRings = drawPopulationRings;
+        this.maxProbability = maxProbability;
+
         this.cellSize = 35;
         this.gridSize = gridSize;
         this.bombAmount = bombAmount;
@@ -281,7 +470,7 @@ public class Game extends JFrame{
 
         Game self = this; // utility
 
-        setMinimumSize(new Dimension(500, 500));
+        setMinimumSize(new Dimension(650, 650));
         setSize(gridSize * cellSize, gridSize * cellSize);
 
         JPanel mineFieldPanel = new JPanel();
@@ -300,8 +489,8 @@ public class Game extends JFrame{
         JLabel remainingLabel = new JLabel(this.remainingBombsCount + " left");
         remainingLabel.setFont(new Font("Arial", Font.BOLD, 18));
 
-        JLabel mainLabel = new JLabel(":)");
-        mainLabel.setFont(new Font("Arial", Font.BOLD, 25));
+        this.mainLabel = new JLabel(":)");
+        this.mainLabel.setFont(new Font("Arial", Font.BOLD, 25));
 
         JButton menuButton = new JButton("Menu");
         menuButton.setFocusPainted(false);
@@ -319,17 +508,28 @@ public class Game extends JFrame{
         hintButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                self.toggleHintMode();
+                self.updateHintMode();
+            }
+        }); 
+
+        JButton autoButton = new JButton("Auto");
+        autoButton.setFocusPainted(false);
+        
+        autoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                self.toggleAutoMode();
             }
         }); 
 
         leftAlignPanel.add(timeLabel);
         leftAlignPanel.add(remainingLabel);
 
-        centerAlignPanel.add(mainLabel);
+        centerAlignPanel.add(this.mainLabel);
 
         rightAlignPanel.add(menuButton);
         rightAlignPanel.add(hintButton);
+        rightAlignPanel.add(autoButton);
 
         gameStatsPanel.setLayout(new GridLayout());
         gameStatsPanel.add(leftAlignPanel);
@@ -364,7 +564,7 @@ public class Game extends JFrame{
                             }
                             else if(currentCell.isBomb) {
                                 self.gameOver = true;
-                                self.toggleHintMode();
+                                self.updateHintMode();
                                 self.timer.stop();
 
                                 try {    
@@ -379,7 +579,7 @@ public class Game extends JFrame{
                                     System.out.println("Could not play audio file");
                                 }
 
-                                mainLabel.setText("x(");
+                                self.mainLabel.setText("x(");
                                 self.revealBombs();
 
                                 ImageIcon explosionIcon = new ImageIcon(getClass().getResource("/res/explosion.png"));
@@ -392,23 +592,32 @@ public class Game extends JFrame{
                                 return;
                             }
 
-                            if(!firstCellRevealed) {
-                                self.populateBombs(currentCell);
+                            if(firstCell == null) {
+                                self.firstCell = currentCell;
+
+                                if (useProbability) {
+                                    self.populateBombsProbability(self.bombAmount);
+                                } else {
+                                    self.populateBombsRandom();
+                                }
+
                                 self.timer.start();
-                                firstCellRevealed = true;
+
+                                if (self.drawProbabilities) {
+                                    self.paintProbabilities();
+                                }
+                                if (self.drawPopulationRings) {
+                                    self.paintPopulationRings();
+                                }
                             }
 
                             try {
                                 self.computeNeighboringBombs(currentCell);
                             }
                             catch (GameWonException e) {
-                                self.gameOver = true;
-                                self.toggleHintMode();
-                                self.timer.stop();
-
-                                mainLabel.setText("B)");
-
+                                self.handleGameWon();
                                 System.out.println(e.getMessage());
+
                                 return;
                             }
 
@@ -420,14 +629,14 @@ public class Game extends JFrame{
                     public void mousePressed(MouseEvent me) {
                         if(SwingUtilities.isLeftMouseButton(me) && !self.gameOver) {
                             if(!currentCell.isRevealed) {
-                                mainLabel.setText(":o");
+                                self.mainLabel.setText(":o");
                             }
                         }
                     }
                     public void mouseReleased(MouseEvent me) {
                         if(SwingUtilities.isLeftMouseButton(me) && !self.gameOver) {
                             if(!currentCell.isRevealed) {
-                                mainLabel.setText(":)");
+                                self.mainLabel.setText(":)");
                             }
                         }
                     }
