@@ -23,6 +23,8 @@ public class Game extends JFrame{
     public boolean gameOver;
     public boolean hintMode;
     public boolean autoSolve;
+
+    public int maxProbability;
     public boolean drawProbabilities;
     public boolean drawPopulationRings;
 
@@ -174,7 +176,7 @@ public class Game extends JFrame{
                     Cell currentCell = this.cells[y][x];
 
                     double randomDouble = random.nextDouble(0, 1);
-                    double probability = currentCell.calculateProbabilityOfBomb(this.firstCell.col, this.firstCell.row, this.gridSize);
+                    double probability = currentCell.calculateProbabilityOfBomb(this.firstCell.col, this.firstCell.row, this.gridSize, this.maxProbability);
 
                     if (randomDouble < probability) {
                         currentCell.makeBomb();
@@ -226,8 +228,8 @@ public class Game extends JFrame{
                     continue;
                 }
 
-                double probability = currentCell.calculateProbabilityOfBomb(this.firstCell.col, this.firstCell.row, this.gridSize);
-                double intensity = probability * 15 * 255;
+                double probability = currentCell.calculateProbabilityOfBomb(this.firstCell.col, this.firstCell.row, this.gridSize, this.maxProbability);
+                double intensity = probability * (100 / this.maxProbability) * 255;
 
                 currentCell.setBackground(new Color(0, 0, (int)(intensity)));
                 currentCell.setForeground(Color.YELLOW);
@@ -402,14 +404,17 @@ public class Game extends JFrame{
         this.mainLabel.setText("B)");
     }
 
-    public Game(int gridSize, int bombAmount, boolean useProbability, boolean drawProbabilities, boolean drawPopulationRings){
+    public Game(int gridSize, int bombAmount, int maxProbability, 
+                boolean useProbability, boolean drawProbabilities, boolean drawPopulationRings){
         this.firstCell = null;
 
         this.gameOver = false;
         this.hintMode = false;
         this.autoSolve = false;
+
         this.drawProbabilities = drawProbabilities;
         this.drawPopulationRings = drawPopulationRings;
+        this.maxProbability = maxProbability;
 
         this.cellSize = 35;
         this.gridSize = gridSize;

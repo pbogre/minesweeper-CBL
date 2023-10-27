@@ -10,6 +10,7 @@ public class Menu extends JFrame {
     public int windowSize;
     public int selectedGridSize;
     public int selectedBombAmount;
+    public int selectedMaxProbability;
 
     public boolean useProbability;
     public boolean drawProbabilities;
@@ -75,10 +76,12 @@ public class Menu extends JFrame {
         }
 
         this.windowSize = windowSize;
-        this.setMinimumSize(new Dimension(600, 600));
+        this.setMinimumSize(new Dimension(600, 800));
         // default grid size & bomb amount (medium difficulty)
         this.selectedGridSize = 20;
         this.selectedBombAmount = 60;
+
+        this.selectedMaxProbability = 8;
 
         this.useProbability = true;
         this.drawProbabilities = false;
@@ -116,6 +119,9 @@ public class Menu extends JFrame {
         JCheckBox useProbabilityToggle = new JCheckBox("Use probability-based bomb population?", this.useProbability);
         JCheckBox drawProbabilitiesToggle = new JCheckBox("Draw probability of cell being picked as bomb?", this.drawProbabilities);
         JCheckBox drawPopulationRingsToggle = new JCheckBox("Draw rings used while populating bombs?", this.drawPopulationRings);
+
+        JSlider maxProbabilitySlider = new JSlider(JSlider.HORIZONTAL, 0, 100, this.selectedMaxProbability);
+        JLabel maxProbabilityLabel = new JLabel("Max. probability: " + this.selectedMaxProbability + "%");
 
         JPanel difficultyPanel = new JPanel();
 
@@ -189,6 +195,18 @@ public class Menu extends JFrame {
         constraints.gridy = 11;
         add(drawPopulationRingsToggle, constraints);
 
+        constraints.gridx = 0;
+        constraints.gridy = 12;
+        maxProbabilitySlider.setMajorTickSpacing(20);
+        maxProbabilitySlider.setMinorTickSpacing(5);
+        maxProbabilitySlider.setPaintTicks(true);
+        maxProbabilitySlider.setPaintLabels(true);
+        add(maxProbabilitySlider, constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 13;
+        add(maxProbabilityLabel, constraints);
+
         this.setDifficulty(this.selectedGridSize, this.selectedBombAmount);
 
         Menu self = this;
@@ -196,7 +214,9 @@ public class Menu extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                     // Start game and stop menu
-                    Game game = new Game(self.selectedGridSize, self.selectedBombAmount, self.useProbability, self.drawProbabilities, self.drawPopulationRings);
+                    Game game = new Game(self.selectedGridSize, self.selectedBombAmount, self.selectedMaxProbability,
+                                         self.useProbability, self.drawProbabilities, self.drawPopulationRings);
+                                         
                     game.run();
                     self.stop();
                 }
@@ -254,6 +274,8 @@ public class Menu extends JFrame {
                 self.useProbability = selected;
                 drawProbabilitiesToggle.setVisible(selected);
                 drawPopulationRingsToggle.setVisible(selected);
+                maxProbabilitySlider.setVisible(selected);
+                maxProbabilityLabel.setVisible(selected);
 
                 if (!self.useProbability) {
                     self.drawProbabilities = false;
@@ -288,6 +310,13 @@ public class Menu extends JFrame {
                     self.drawProbabilities = false;
                     drawProbabilitiesToggle.setSelected(false);
                 }
+            }
+        });
+        maxProbabilitySlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e){
+                self.selectedMaxProbability = maxProbabilitySlider.getValue();
+                maxProbabilityLabel.setText("Max. Probability: " + self.selectedMaxProbability + "%");
             }
         });
     }
