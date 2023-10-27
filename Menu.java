@@ -13,6 +13,7 @@ public class Menu extends JFrame {
 
     public boolean useProbability;
     public boolean drawProbabilities;
+    public boolean drawPopulationRings;
 
     private JLabel selectDifficultyLabel;
 
@@ -22,7 +23,6 @@ public class Menu extends JFrame {
     private JLabel bombAmountLabel;
 
     private ImageIcon menuIcon;
-
 
     public void updateCustomDifficulty() {
         this.gridSizeLabel.setText("Grid size: " + this.gridSizeSlider.getValue());
@@ -82,6 +82,7 @@ public class Menu extends JFrame {
 
         this.useProbability = true;
         this.drawProbabilities = false;
+        this.drawPopulationRings = false;
 
         setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
@@ -114,6 +115,7 @@ public class Menu extends JFrame {
 
         JCheckBox useProbabilityToggle = new JCheckBox("Use probability-based bomb population?", this.useProbability);
         JCheckBox drawProbabilitiesToggle = new JCheckBox("Draw probability of cell being picked as bomb?", this.drawProbabilities);
+        JCheckBox drawPopulationRingsToggle = new JCheckBox("Draw rings used while populating bombs?", this.drawPopulationRings);
 
         JPanel difficultyPanel = new JPanel();
 
@@ -183,6 +185,10 @@ public class Menu extends JFrame {
         constraints.gridy = 10;
         add(drawProbabilitiesToggle, constraints);
 
+        constraints.gridx = 0;
+        constraints.gridy = 11;
+        add(drawPopulationRingsToggle, constraints);
+
         this.setDifficulty(this.selectedGridSize, this.selectedBombAmount);
 
         Menu self = this;
@@ -190,7 +196,7 @@ public class Menu extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                     // Start game and stop menu
-                    Game game = new Game(self.selectedGridSize, self.selectedBombAmount, self.useProbability, self.drawProbabilities);
+                    Game game = new Game(self.selectedGridSize, self.selectedBombAmount, self.useProbability, self.drawProbabilities, self.drawPopulationRings);
                     game.run();
                     self.stop();
                 }
@@ -247,9 +253,14 @@ public class Menu extends JFrame {
 
                 self.useProbability = selected;
                 drawProbabilitiesToggle.setVisible(selected);
+                drawPopulationRingsToggle.setVisible(selected);
 
                 if (!self.useProbability) {
                     self.drawProbabilities = false;
+                    self.drawPopulationRings = false;
+
+                    drawProbabilitiesToggle.setSelected(false);
+                    drawPopulationRingsToggle.setSelected(false);
                 }
             }
         });
@@ -259,8 +270,25 @@ public class Menu extends JFrame {
                 boolean selected = (e.getStateChange() == 1);
 
                 self.drawProbabilities = selected;
+
+                if (selected && self.drawPopulationRings) {
+                    self.drawPopulationRings = false;
+                    drawPopulationRingsToggle.setSelected(false);
+                }
             }
         });
-            
+        drawPopulationRingsToggle.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                boolean selected = (e.getStateChange() == 1);
+
+                self.drawPopulationRings = selected;
+
+                if (selected && self.drawProbabilities) {
+                    self.drawProbabilities = false;
+                    drawProbabilitiesToggle.setSelected(false);
+                }
+            }
+        });
     }
 }

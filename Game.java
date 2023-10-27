@@ -24,6 +24,7 @@ public class Game extends JFrame{
     public boolean hintMode;
     public boolean autoSolve;
     public boolean drawProbabilities;
+    public boolean drawPopulationRings;
 
     public int gridSize;
     public int cellSize;
@@ -64,7 +65,7 @@ public class Game extends JFrame{
         // if disabling hint mode, reset color of all cells unrevealed
         // also do this if gameover
         if(!this.hintMode || this.gameOver) {
-            this.resetCellsColor();
+            this.resetCells();
 
             return;
         }
@@ -85,7 +86,7 @@ public class Game extends JFrame{
         this.solveSituation();
     }
 
-    public void resetCellsColor() {
+    public void resetCells() {
 
         if (this.drawProbabilities) {
             this.paintProbabilities();
@@ -102,6 +103,7 @@ public class Game extends JFrame{
                 }
 
                 currentCell.setBackground(new Color(180, 180, 180));
+                currentCell.setText("");
             }
         }
     }
@@ -165,9 +167,11 @@ public class Game extends JFrame{
 
                     Cell currentCell = this.cells[y][x];
 
-                    //currentCell.setBackground(d % 2 == 0 ? Color.WHITE : Color.BLACK);
-                    //currentCell.setForeground(d % 2 == 0 ? Color.BLACK : Color.WHITE);
-                    //currentCell.setText(String.valueOf(d));
+                    if (this.drawPopulationRings) {
+                        currentCell.setBackground(d % 2 == 0 ? Color.WHITE : Color.BLACK);
+                        currentCell.setForeground(d % 2 == 0 ? Color.BLACK : Color.WHITE);
+                        currentCell.setText(String.valueOf(d));
+                    }
 
                     double randomDouble = random.nextDouble(0, 1);
                     double probability = currentCell.calculateProbabilityOfBomb(this.firstCell.col, this.firstCell.row, this.gridSize);
@@ -355,13 +359,14 @@ public class Game extends JFrame{
         this.mainLabel.setText("B)");
     }
 
-    public Game(int gridSize, int bombAmount, boolean useProbability, boolean drawProbabilities){
+    public Game(int gridSize, int bombAmount, boolean useProbability, boolean drawProbabilities, boolean drawPopulationRings){
         this.firstCell = null;
 
         this.gameOver = false;
         this.hintMode = false;
         this.autoSolve = false;
         this.drawProbabilities = drawProbabilities;
+        this.drawPopulationRings = drawPopulationRings;
 
         this.cellSize = 35;
         this.gridSize = gridSize;
