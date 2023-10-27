@@ -106,7 +106,7 @@ public class Cell extends JButton {
     }
 
     // explanation for the calculation of the probabilty of a cell 
-    // being a bomb can be found here: https://www.desmos.com/calculator/vo8q8z5ecx
+    // being a bomb can be found here: https://www.desmos.com/calculator/b3lcshvkvg
     double calculateProbabilityOfBomb(int x, int y, int gridSize, int maxProbability) {
         // we use the simple grid distance because 
         // it is computationally faster than pythagora
