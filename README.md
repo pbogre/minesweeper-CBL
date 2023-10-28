@@ -1,6 +1,13 @@
 # Minesweeper Game with Solver (CBL)
 
-This is a Minesweeper project written in Java that includes a graphical user interface (GUI) using Swing for playing the game and an automatic solver that can solve Minesweeper boards. The project allows you to enjoy interactive Minesweeper gameplay and explore solving algorithms.
+This is a Minesweeper project written in Java that includes a graphical user
+interface (GUI) using Swing for playing the game and an automatic solver that
+can solve Minesweeper boards. The project allows you to enjoy interactive
+Minesweeper gameplay and explore solving algorithms.
+
+> Disclaimer! If you are using a touchpad/trackpad, it is recommended that you
+> lift your finger completely before clicking again when playing the game for
+> a smoother experience.
 
 ## Table of Contents
 
@@ -31,5 +38,15 @@ This is a Minesweeper project written in Java that includes a graphical user int
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/minesweeper-repo.git
+   git clone https://github.com/pbogre/minesweeper-CBL.git
+   ```
 
+2. Compile using javac:
+   ```bash
+   javac Minesweeper.java
+   ```
+
+3. Run the program:
+   ```bash
+   java Minesweeper
+   ```
