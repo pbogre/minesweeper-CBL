@@ -4,8 +4,8 @@ class GuessRequiredException extends Exception {
 
     ArrayList<Cell> unknownCells;
 
-    GuessRequiredException(ArrayList<Cell> unknownCells, int unrevealedSafe) {
-        super("[GUESS] Total Unknown: " + unknownCells.size() + ", Unrevealed Safe: " + unrevealedSafe );
+    GuessRequiredException(ArrayList<Cell> unknownCells) {
+        super("Guess required! Total Unknown: " + unknownCells.size());
         this.unknownCells = unknownCells;
     }
 }
@@ -213,7 +213,7 @@ public class Solver {
         // if solved situation has no newly found safe cells 
         // and there are no more safe cells to be revealed
         if (newlyFoundSafe == 0 && newlyFoundBombs == 0 && this.unrevealedSafe <= 0) {
-            throw new GuessRequiredException(this.foundUnknown, this.unrevealedSafe);
+            throw new GuessRequiredException(this.foundUnknown);
         }
 
         ArrayList<ArrayList<Cell>> solvedSituation = new ArrayList<ArrayList<Cell>>();
