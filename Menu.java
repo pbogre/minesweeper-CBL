@@ -358,6 +358,12 @@ public class Menu extends JFrame {
             @Override
             public void stateChanged(ChangeEvent e){
                 self.selectedMaxProbability = maxProbabilitySlider.getValue();
+
+                // dont want 0% probability as that breaks the population
+                if (self.selectedMaxProbability == 0) {
+                    self.selectedMaxProbability = 1;
+                }
+
                 maxProbabilityLabel.setText("Max. probability: " + self.selectedMaxProbability + "%");
             }
         });
