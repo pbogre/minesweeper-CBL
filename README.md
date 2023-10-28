@@ -14,10 +14,6 @@ Minesweeper gameplay and explore solving algorithms.
 - **Features**
 - **Prerequisites**
 - **Installation**
-- **Usage**
-- **Solver**
-- **Contributing**
-- **License**
 
 ## Features
 
