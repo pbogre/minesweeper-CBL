@@ -12,25 +12,44 @@ public class Cell extends JButton {
     public boolean isFlagged;
     public boolean isRevealed;
 
+    /**
+     * The markUnknown function sets the background color of the cell to yellow if it's unsure.
+     */
     void markUnknown() {
         this.setForeground(Color.BLACK);
         this.setBackground(Color.YELLOW);
     }
 
+    /**
+     * The markSafe() function sets the background color of the cell to green if it is clear.
+     */
     void markSafe() {
         this.setForeground(Color.BLACK);
         this.setBackground(Color.GREEN);
     }
 
+    /**
+     * The markBomb() function changes the background color to red if it is a bomb.
+     */
     void markBomb() {
         this.setForeground(Color.BLACK);
         this.setBackground(Color.RED);
     }
 
+    /**
+     * The function "makeBomb" sets the "isBomb" variable to true.
+     */
     void makeBomb() {
         this.isBomb = true;
     }
 
+    /**
+     * The function sets the number of neighboring bombs and updates the icon of the cell based on the
+     * number of neighboring bombs.
+     * 
+     * @param neighboringBombs The parameter `neighboringBombs` represents the number of neighboring
+     * bombs around a particular cell in a game.
+     */
     void setNeighboringBombs(int neighboringBombs) {
         ImageIcon icon;
         this.neighboringBombs = neighboringBombs;
@@ -74,6 +93,10 @@ public class Cell extends JButton {
         }
     }
 
+    /**
+     * The `reveal` function updates the appearance of a component based on its properties, such as
+     * setting an icon if it represents a bomb or changing the background color and border.
+     */
     void reveal() {
         this.isRevealed = true;
 
@@ -88,6 +111,9 @@ public class Cell extends JButton {
         setText("");
     }
 
+    /**
+     * The function toggles a flag on a cell and updates its icon accordingly.
+     */
     void toggleFlag() {
         if(this.isRevealed){
             return;
@@ -105,8 +131,21 @@ public class Cell extends JButton {
         }
     }
 
-    // explanation for the calculation of the probabilty of a cell 
-    // being a bomb can be found here: https://www.desmos.com/calculator/b3lcshvkvg
+    
+    /**
+     * The function calculates the probability of a bomb being present at a given position in a grid
+     * based on the distance from the current position and the size of the grid. Explanation of the probability
+     * of a bomb: https://www.desmos.com/calculator/b3lcshvkvg
+     * 
+     * @param x The x-coordinate of the cell for which we want to calculate the probability of a bomb.
+     * @param y The y-coordinate of the current position on the grid.
+     * @param gridSize The gridSize parameter represents the size of the grid. It is used in the
+     * calculation of the probability of a bomb being present at a certain location.
+     * @param maxProbability The maximum probability of a bomb being present in the grid. It is given
+     * as a percentage, so it should be a value between 0 and 100.
+     * @return The method is returning the probability of a bomb being present at a given position on a
+     * grid.
+     */
     double calculateProbabilityOfBomb(int x, int y, int gridSize, int maxProbability) {
         // we use the simple grid distance because 
         // it is computationally faster than pythagora
@@ -126,6 +165,14 @@ public class Cell extends JButton {
         setText("");
     }
 
+    /**
+     * The equals() function checks if two Cell objects have the same row and column values.
+     * 
+     * @param obj The "obj" parameter is an object that is being compared to the current object for
+     * equality.
+     * @return The method is returning a boolean value, which indicates whether the current object is
+     * equal to the object being compared.
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -136,6 +183,13 @@ public class Cell extends JButton {
                col == cell.col;
     }
 
+    /**
+     * The hashCode() function in Java returns the hash code value for the object based on the values
+     * of the row and col variables.
+     * 
+     * @return The method is returning the hash code of the combination of the "row" and "col"
+     * variables.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(row, col);
