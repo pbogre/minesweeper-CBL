@@ -88,8 +88,6 @@ public class Solver {
                     }
                 }
 
-                //System.out.println("[SAFE] ("+cell.col+", "+cell.row+") - " + "cell.neighboringBombs: " + cell.neighboringBombs + ", neighboringFoundBombs: " + neighboringFoundBombs);
-
                 if (neighboringFoundBombs == cell.neighboringBombs) {
                     for(Cell safe : neighboringPossible) {
                         newlyFoundSafe++;
@@ -167,8 +165,6 @@ public class Solver {
                     }
                 }
 
-                //System.out.println("[BOMB] ("+cell.col+", "+cell.row+") - " + "cell.neighboringBombs: " + cell.neighboringBombs + ", neighboringPossible.size(): " + neighboringPossible.size());
-
                 if(neighboringPossible.size() == cell.neighboringBombs) {
                     for(Cell bomb : neighboringPossible) {
                         if (!this.foundBombs.contains(bomb)) {
@@ -209,14 +205,9 @@ public class Solver {
         int newlyFoundBombs = computeBombs();
         int newlyFoundSafe = computeSafe();
 
-        //int iteration = 0;
-        //System.out.println("["+iteration+"] Bombs: " + this.foundBombs.size() + ", Safe: " + this.foundSafe.size());
         while (newlyFoundBombs != 0 && newlyFoundSafe != 0) {
             newlyFoundBombs = this.computeBombs();
             newlyFoundSafe = this.computeSafe();
-
-            //System.out.println("["+iteration+"] Bombs: " + currentFoundBombs + ", Safe: " + currentFoundSafe);
-            //iteration++;
         }
 
         // if solved situation has no newly found safe cells 
