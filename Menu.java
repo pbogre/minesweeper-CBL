@@ -100,7 +100,7 @@ public class Menu extends JFrame {
         }
 
         this.windowSize = windowSize;
-        this.setMinimumSize(new Dimension(600, 800));
+        this.setMinimumSize(new Dimension(550, 600));
         // default grid size & bomb amount (medium difficulty)
         this.selectedGridSize = 20;
         this.selectedBombAmount = 60;
