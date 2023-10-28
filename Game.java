@@ -199,6 +199,11 @@ public class Game extends JFrame{
 
                     Cell currentCell = this.cells[y][x];
 
+                    // skip if already bomb
+                    if (currentCell.isBomb) {
+                        continue;
+                    }
+
                     double randomDouble = random.nextDouble(0, 1);
                     double probability = currentCell.calculateProbabilityOfBomb(this.firstCell.col, this.firstCell.row, this.gridSize, this.maxProbability);
 
