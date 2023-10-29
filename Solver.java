@@ -1,14 +1,22 @@
 import java.util.*;
 
+
 class GuessRequiredException extends Exception {
 
     ArrayList<Cell> unknownCells;
-
+    /**
+    * This exception is thrown when a guess is required to continue solving the game.
+    */
+    
     GuessRequiredException(ArrayList<Cell> unknownCells) {
         super("Guess required! Total Unknown: " + unknownCells.size());
         this.unknownCells = unknownCells;
     }
 }
+/**
+ * The `Solver` class is used to solve a Minesweeper game. 
+ * It contains methods for computing the number
+ */
 
 public class Solver {
     public int unrevealedSafe;
@@ -24,7 +32,7 @@ public class Solver {
      * @param cell The parameter "cell" represents a specific cell in a game or grid.
      */
     public void reveal(Cell cell) {
-        if(this.foundSafe.contains(cell)) {
+        if (this.foundSafe.contains(cell)) {
             this.unrevealedSafe--;
         }
         this.foundUnknown.remove(cell);
@@ -44,52 +52,55 @@ public class Solver {
     //     all unrevealed neighboring cells that aren't 100% bombs must be safe
 
     /**
-     * The function `computeSafe()` iterates through the cells of a game grid and determines if a cell
-     * is safe based on the number of neighboring bombs and the cells that have already been revealed.
+     * The function `computeSafe()` iterates through 
+     * the cells of a game grid and determines if a cell
+     * is safe based on the number of neighboring bombs 
+     * and the cells that have already been revealed.
      * 
      * @return The method `computeSafe()` returns an integer value, which represents the number of
-     * newly found safe cells.
+     *      newly found safe cells.
      */
     private int computeSafe() {
         int newlyFoundSafe = 0;
 
-        for(int y = 0; y < this.game.gridSize; y++) {
-            for(int x = 0; x < this.game.gridSize; x++) {
+        for (int y = 0; y < this.game.gridSize; y++) {
+            for (int x = 0; x < this.game.gridSize; x++) {
                 Cell cell = this.game.cells[y][x];
 
-                if(cell.neighboringBombs == 0 || !cell.isRevealed) {
+                if (cell.neighboringBombs == 0 || !cell.isRevealed) {
                     continue;
                 }
 
                 int neighboringFoundBombs = 0;
                 ArrayList<Cell> neighboringPossible = new ArrayList<Cell>();
-                for(int ny = y - 1; ny <= y + 1; ny++) {
-                    for(int nx = x - 1; nx <= x +1; nx++ ) {
+                for (int ny = y - 1; ny <= y + 1; ny++) {
+                    for (int nx = x - 1; nx <= x + 1; nx++) {
 
-                        if(ny < 0 || nx < 0 || ny >= this.game.gridSize || nx >= this.game.gridSize) {
+                        if (ny < 0 || nx < 0 || ny >= this.game.gridSize 
+                            || nx >= this.game.gridSize) {
                             continue;
                         }
 
-                        if(ny == y && nx == x) {
+                        if (ny == y && nx == x) {
                             continue;
                         }
 
                         Cell neighboringCell = this.game.cells[ny][nx];
 
-                        if(neighboringCell.isRevealed) {
+                        if (neighboringCell.isRevealed) {
                             continue;
                         }
 
-                        if(this.foundBombs.contains(neighboringCell)) {
+                        if (this.foundBombs.contains(neighboringCell)) {
                             neighboringFoundBombs++;
-                        } else if (!this.foundSafe.contains(neighboringCell)){
+                        } else if (!this.foundSafe.contains(neighboringCell)) {
                             neighboringPossible.add(neighboringCell);
                         }
                     }
                 }
 
                 if (neighboringFoundBombs == cell.neighboringBombs) {
-                    for(Cell safe : neighboringPossible) {
+                    for (Cell safe : neighboringPossible) {
                         newlyFoundSafe++;
                         unrevealedSafe++;
                         this.foundSafe.add(safe);
@@ -97,8 +108,9 @@ public class Solver {
                         this.foundUnknown.remove(safe);
                     }
                 } else {
-                    for(Cell unknown : neighboringPossible) {
-                        if(!this.foundBombs.contains(unknown) && !this.foundUnknown.contains(unknown)) {
+                    for (Cell unknown : neighboringPossible) {
+                        if (!this.foundBombs.contains(unknown) 
+                            && !this.foundUnknown.contains(unknown)) {
                             this.foundUnknown.add(unknown);
                         }
                     }
@@ -124,32 +136,34 @@ public class Solver {
     //     all unrevealed neighboring cells that aren't 100% safe are bombs
 
     /**
-     * The function computes the number of newly found bombs based on the neighboring cells of revealed
+     * The function computes the number of newly 
+     * found bombs based on the neighboring cells of revealed
      * cells in a game grid.
      * 
      * @return The method `computeBombs()` returns an integer value, which represents the number of
-     * newly found bombs.
+     *      newly found bombs.
      */
     private int computeBombs() {
         int newlyFoundBombCount = 0;
 
-        for(int y = 0; y < this.game.gridSize; y++) {
-            for(int x = 0; x < this.game.gridSize; x++) {
+        for (int y = 0; y < this.game.gridSize; y++) {
+            for (int x = 0; x < this.game.gridSize; x++) {
                 Cell cell = this.game.cells[y][x];
 
-                if(cell.neighboringBombs == 0 || !cell.isRevealed) {
+                if (cell.neighboringBombs == 0 || !cell.isRevealed) {
                     continue;
                 }
 
                 ArrayList<Cell> neighboringPossible = new ArrayList<Cell>();
-                for(int ny = y - 1; ny <= y + 1; ny++) {
-                    for(int nx = x - 1; nx <= x +1; nx++ ) {
+                for (int ny = y - 1; ny <= y + 1; ny++) {
+                    for (int nx = x - 1; nx <= x + 1; nx++) {
 
-                        if(ny < 0 || nx < 0 || ny >= this.game.gridSize || nx >= this.game.gridSize) {
+                        if (ny < 0 || nx < 0 || ny >= this.game.gridSize 
+                            || nx >= this.game.gridSize) {
                             continue;
                         }
 
-                        if(ny == y && nx == x) {
+                        if (ny == y && nx == x) {
                             continue;
                         }
 
@@ -159,14 +173,14 @@ public class Solver {
                             continue;
                         }
 
-                        if(!this.foundSafe.contains(neighboringCell)) {
+                        if (!this.foundSafe.contains(neighboringCell)) {
                             neighboringPossible.add(neighboringCell);
                         }
                     }
                 }
 
-                if(neighboringPossible.size() == cell.neighboringBombs) {
-                    for(Cell bomb : neighboringPossible) {
+                if (neighboringPossible.size() == cell.neighboringBombs) {
+                    for (Cell bomb : neighboringPossible) {
                         if (!this.foundBombs.contains(bomb)) {
                             newlyFoundBombCount++;
                             this.foundBombs.add(bomb);
@@ -193,9 +207,12 @@ public class Solver {
     // some 100% bombs are required to find 100% safe cells
 
     /**
-     * The function "solveSituation" attempts to solve a situation by iteratively computing the number
-     * of bombs and safe cells until no new bombs or safe cells are found, and then returns the solved
-     * situation as an ArrayList of ArrayLists containing the found safe cells, found bombs, and found
+     * The function "solveSituation" attempts to 
+     * solve a situation by iteratively computing the number
+     * of bombs and safe cells until no new bombs or safe 
+     * cells are found, and then returns the solved
+     * situation as an ArrayList of ArrayLists containing 
+     * the found safe cells, found bombs, and found
      * unknown cells.
      * 
      * @return The method is returning an ArrayList of ArrayLists of Cell objects.
@@ -224,11 +241,12 @@ public class Solver {
         return solvedSituation;
     }
 
-    // The `Solver(Game game)` constructor initializes a new instance of the `Solver` class. It takes a
-    // `Game` object as a parameter and assigns it to the `game` instance variable. It also initializes
-    // the `unrevealedSafe` variable to 0 and creates new `ArrayList` objects for `foundBombs`,
-    // `foundSafe`, and `foundUnknown`. These lists will be used to store the cells that are found to
-    // be bombs, safe, and unknown, respectively, during the solving process.
+    /**
+     * The `Solver` constructor initializes a new instance of the `Solver` class with the specified
+     * game.
+     * 
+     * @param game The parameter "game" represents a Minesweeper game.
+     */
     Solver(Game game) {
         this.game = game;
         this.unrevealedSafe = 0;

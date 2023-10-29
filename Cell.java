@@ -1,9 +1,10 @@
+import java.awt.*;
+import java.util.*;
 import javax.swing.*;
 
-import java.awt.*;
-
-import java.util.*;
-
+/**
+ * The `Cell` class represents a single cell in a Minesweeper game.
+ */
 public class Cell extends JButton {
     public final int row;
     public final int col;
@@ -44,48 +45,60 @@ public class Cell extends JButton {
     }
 
     /**
-     * The function sets the number of neighboring bombs and updates the icon of the cell based on the
+     * The function sets the number of neighboring bombs 
+     * and updates the icon of the cell based on the
      * number of neighboring bombs.
      * 
      * @param neighboringBombs The parameter `neighboringBombs` represents the number of neighboring
-     * bombs around a particular cell in a game.
+     *      bombs around a particular cell in a game.
      */
     void setNeighboringBombs(int neighboringBombs) {
         ImageIcon icon;
         this.neighboringBombs = neighboringBombs;
-        if(this.neighboringBombs != 0) {
-            switch(neighboringBombs){
+
+        if (this.neighboringBombs != 0) {
+
+            switch (neighboringBombs) {
+                
                 case 1:
                     icon = new ImageIcon(getClass().getResource("/res/1.png"));
-                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
+                    setIcon(new ImageIcon(icon.getImage()
+                        .getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
                     break;
                 case 2:
                     icon = new ImageIcon(getClass().getResource("/res/2.png"));
-                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
+                    setIcon(new ImageIcon(icon.getImage()
+                        .getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
                     break;
                 case 3:
                     icon = new ImageIcon(getClass().getResource("/res/3.png"));
-                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
+                    setIcon(new ImageIcon(icon.getImage()
+                        .getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
                     break;
                 case 4:
                     icon = new ImageIcon(getClass().getResource("/res/4.png"));
-                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
+                    setIcon(new ImageIcon(icon.getImage()   
+                        .getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
                     break;
                 case 5:
                     icon = new ImageIcon(getClass().getResource("/res/5.png"));
-                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
+                    setIcon(new ImageIcon(icon.getImage()
+                        .getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
                     break;
                 case 6:
                     icon = new ImageIcon(getClass().getResource("/res/6.png"));
-                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
+                    setIcon(new ImageIcon(icon.getImage()
+                        .getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
                     break;
                 case 7:
                     icon = new ImageIcon(getClass().getResource("/res/7.png"));
-                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
+                    setIcon(new ImageIcon(icon.getImage()
+                        .getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
                     break;
                 case 8:
                     icon = new ImageIcon(getClass().getResource("/res/8.png"));
-                    setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
+                    setIcon(new ImageIcon(icon.getImage()
+                        .getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
                     break;
                 default:
                     return;
@@ -100,9 +113,10 @@ public class Cell extends JButton {
     void reveal() {
         this.isRevealed = true;
 
-        if(this.isBomb) {
+        if (this.isBomb) {
             ImageIcon icon = new ImageIcon(getClass().getResource("/res/bomb.png"));
-            setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
+            setIcon(new ImageIcon(icon.getImage()
+                .getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
             return;
         }
 
@@ -115,7 +129,8 @@ public class Cell extends JButton {
      * The function toggles a flag on a cell and updates its icon accordingly.
      */
     void toggleFlag() {
-        if(this.isRevealed){
+        
+        if (this.isRevealed) {
             return;
         }
 
@@ -123,9 +138,9 @@ public class Cell extends JButton {
             this.isFlagged = true;
 
             ImageIcon icon = new ImageIcon(getClass().getResource("/res/flag.png"));
-            setIcon(new ImageIcon(icon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
-        }
-        else if(this.isFlagged){
+            setIcon(new ImageIcon(icon.getImage()
+                .getScaledInstance(20, 20, java.awt.Image.SCALE_FAST)));
+        } else if (this.isFlagged) {
             this.isFlagged = false;
             setIcon(null);
         }
@@ -133,28 +148,41 @@ public class Cell extends JButton {
 
     
     /**
-     * The function calculates the probability of a bomb being present at a given position in a grid
-     * based on the distance from the current position and the size of the grid. Explanation of the probability
+     * The function calculates the probability 
+     * of a bomb being present at a given position in a grid
+     * based on the distance from the current 
+     * position and the size of the grid. Explanation of the probability
      * of a bomb: https://www.desmos.com/calculator/b3lcshvkvg
      * 
-     * @param x The x-coordinate of the cell for which we want to calculate the probability of a bomb.
+     * @param x The x-coordinate of the cell for 
+     *      which we want to calculate the probability of a bomb.
      * @param y The y-coordinate of the current position on the grid.
      * @param gridSize The gridSize parameter represents the size of the grid. It is used in the
-     * calculation of the probability of a bomb being present at a certain location.
-     * @param maxProbability The maximum probability of a bomb being present in the grid. It is given
-     * as a percentage, so it should be a value between 0 and 100.
-     * @return The method is returning the probability of a bomb being present at a given position on a
-     * grid.
+     *      calculation of the probability of a bomb being present at a certain location.
+     * @param maxProbability The maximum probability of a bomb being 
+     *      present in the grid. It is given
+     *      as a percentage, so it should be a value between 0 and 100.
+     * @return The method is returning the probability 
+     *      of a bomb being present at a given position on a grid.
+     * 
      */
     double calculateProbabilityOfBomb(int x, int y, int gridSize, int maxProbability) {
         // we use the simple grid distance because 
         // it is computationally faster than pythagora
         double distance = Math.abs(y - this.row) + Math.abs(x - this.col);
-        double probability = (maxProbability / 100.0) * (2 / Math.PI) * Math.atan((distance * distance) / gridSize);
+        double probability = (maxProbability / 100.0) 
+            * (2 / Math.PI) * Math.atan((distance * distance) / gridSize);
 
         return probability;
     }
 
+    /**
+     * The `Cell` constructor initializes a new instance of the `Cell` class with the specified row
+     * and column values. It sets the background color, border, and text of the cell.
+     *
+     * @param row The row value of the cell.
+     * @param col The column value of the cell.
+     */
     Cell(int row, int col) {
         this.row = row;
         this.col = col;
@@ -168,27 +196,34 @@ public class Cell extends JButton {
     /**
      * The equals() function checks if two Cell objects have the same row and column values.
      * 
-     * @param obj The "obj" parameter is an object that is being compared to the current object for
-     * equality.
-     * @return The method is returning a boolean value, which indicates whether the current object is
-     * equal to the object being compared.
+     * @param obj The "obj" parameter is an object 
+     *      that is being compared to the current object for equality.
+     * 
+     * @return The method is returning a boolean value, 
+     *      which indicates whether the current object is
+     *      equal to the object being compared.
      */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass())
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
+        }
         Cell cell = (Cell) obj;
-        return row == cell.row &&
+        return row == cell.row 
+                &&
                col == cell.col;
     }
 
     /**
-     * The hashCode() function in Java returns the hash code value for the object based on the values
+     * The hashCode() function in Java returns 
+     * the hash code value for the object based on the values
      * of the row and col variables.
      * 
      * @return The method is returning the hash code of the combination of the "row" and "col"
-     * variables.
+     *      variables.
      */
     @Override
     public int hashCode() {
